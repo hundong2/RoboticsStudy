@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "ipykernel>=7.3.0",
     "jedi>=0.20.0",
+    "matplot>=0.1.9",
     "opencv-python>=4.13.0.92",
 ]
