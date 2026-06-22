@@ -15,6 +15,14 @@
 [Ll]og/
 [Ll]ogs/
 
+# .NET/C# executable artifacts
+*.exe
+*.dll
+*.pdb
+*.apphost
+*.runtimeconfig.json
+*.deps.json
+
 # MSBuild Binary and Structured Log
 *.binlog
 
