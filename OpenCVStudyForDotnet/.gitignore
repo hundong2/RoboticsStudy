@@ -11,6 +11,8 @@
 # Build results
 [Bb]in/
 [Oo]bj/
+[Dd]ebug/
+[Rr]elease/
 [Ee]xt/
 [Ll]og/
 [Ll]ogs/
