@@ -16,6 +16,19 @@
             "stopAtEntry": false
         },
         {
+            "name": "Window CSX Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet-script",
+            "args": [
+                "${file}",
+                "--debug"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
             "name": "Python: Current File (.venv)",
             "type": "debugpy",
             "request": "launch",
