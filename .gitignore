@@ -29,3 +29,5 @@ publish/
 # MSBuild
 *.log
 *.binlog
+
+.fake
