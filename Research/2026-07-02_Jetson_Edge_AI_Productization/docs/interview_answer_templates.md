@@ -14,10 +14,10 @@ Jetson Orin Nano와 카메라 모듈을 사용해 실시간 객체 탐지 pipeli
 제품화 관점에서는 PyTorch 모델 실행만으로는 부족하다고 보고, ONNX export와 TensorRT FP16 engine 변환까지 포함했습니다. 성능은 FPS만 보지 않고 frame capture부터 preprocessing, inference, NMS, rendering까지 포함한 end-to-end latency를 측정합니다. 또한 false positive와 false negative 이미지를 따로 분석해 데이터 보강과 threshold 조정 방향을 도출합니다.
 ```
 
-## 3. 한화비전 직무 연결 답변
+## 3. 직무 연결 답변
 
 ```text
-한화비전은 영상 보안과 edge AI camera가 중요한 회사이기 때문에, 단순 모델 연구보다 실제 카메라 입력과 edge inference 환경을 이해하는 것이 중요하다고 봤습니다. 저는 기존에 C/C++/C#/Python과 임베디드, 자동화 경험이 있기 때문에, AI 모델을 학습하는 것에서 끝내지 않고 ONNX, TensorRT, 카메라 pipeline, 성능 측정, 로그 분석까지 연결하는 방향으로 역량을 쌓고 있습니다.
+ 영상 보안과 edge AI camera가 중요한 회사이기 때문에, 단순 모델 연구보다 실제 카메라 입력과 edge inference 환경을 이해하는 것이 중요하다고 봤습니다. 저는 기존에 C/C++/C#/Python과 임베디드, 자동화 경험이 있기 때문에, AI 모델을 학습하는 것에서 끝내지 않고 ONNX, TensorRT, 카메라 pipeline, 성능 측정, 로그 분석까지 연결하는 방향으로 역량을 쌓고 있습니다.
 ```
 
 ## 4. 약점 보완형 답변
