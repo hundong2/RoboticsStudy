@@ -2,13 +2,29 @@
 
 ## Todo 
 
+- [ ] [LLM/VLM 용어집](./Research/용어집/README.md)
+
 - [ ] [CNN 및 관련 기술](./ETC/README.md)  
 - [ ] [HOG](./opencv4/08.MachineLearning.md)     
 - [ ] [Research](./Research/README.md)  
+- [ ] [Jetson Orin Nano Edge AI Productization](./Research/2026-07-02_Jetson_Edge_AI_Productization/README.md)
+- [ ] [Darknet YOLO 정리 및 실습](./ETC/tech/darknet.md)
 
 
 > OpenCV를 Python 및 C#(.NET)으로 학습하기 위한 스터디 저장소입니다.  
 > *"C#과 파이썬을 활용한 OpenCV4 프로그래밍"* 교재 예제 실습 및 개인 실험 코드를 포함합니다.
+
+## LLM/VLM 용어집 파일 목록
+
+- [용어집 README](./Research/용어집/README.md)
+- [01. LLM 기본 용어](./Research/용어집/01_llm_core.md)
+- [02. Attention과 Transformer 용어](./Research/용어집/02_attention_transformer.md)
+- [03. KV Cache와 추론 시스템 용어](./Research/용어집/03_kv_cache_inference.md)
+- [04. 학습, 튜닝, 정렬 용어](./Research/용어집/04_training_finetuning.md)
+- [05. 효율화, 병렬화, 서빙 용어](./Research/용어집/05_efficiency_systems.md)
+- [06. 평가 지표와 벤치마크 용어](./Research/용어집/06_evaluation_benchmarks.md)
+- [07. VLM과 멀티모달 용어](./Research/용어집/07_multimodal_vlm.md)
+- [08. 논문 독해용 학습 전략](./Research/용어집/08_paper_reading_strategy.md)
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Python](https://img.shields.io/badge/Python-3.13%2B-blue.svg)
