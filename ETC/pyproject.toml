@@ -1,0 +1,14 @@
+[project]
+name = "robotics-study-etc-play"
+version = "0.1.0"
+description = "Small Python demos for robotics deep-learning terms"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "opencv-python>=4.10",
+    "onnx>=1.16",
+    "onnxruntime>=1.18",
+]
+
+[tool.uv]
+package = false

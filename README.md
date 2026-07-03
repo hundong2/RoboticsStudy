@@ -1,5 +1,12 @@
 # RoboticsStudy
 
+## Todo 
+
+- [ ] [CNN 및 관련 기술](./ETC/README.md)  
+- [ ] [HOG](./opencv4/08.MachineLearning.md)     
+- [ ] [Research](./Research/README.md)  
+
+
 > OpenCV를 Python 및 C#(.NET)으로 학습하기 위한 스터디 저장소입니다.  
 > *"C#과 파이썬을 활용한 OpenCV4 프로그래밍"* 교재 예제 실습 및 개인 실험 코드를 포함합니다.
 

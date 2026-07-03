@@ -1,0 +1,4 @@
+.venv/
+play/tiny_linear.onnx
+__pycache__/
+*.pyc
