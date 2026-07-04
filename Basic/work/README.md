@@ -29,8 +29,26 @@ work/
 4. 비전 추론: `python shared/03_yolo_camera_infer.py --source 0`
 5. Ollama 명령 파싱: `python shared/04_ollama_command_parser.py "빨간 컵을 집어 왼쪽에 놓아줘"`
 6. ROS2 topic 구조 이해: `python shared/05_ros2_camera_node_guide.py`
-7. SLAM/Nav2 점검: `python slam_nav2/01_slam_nav2_readiness_check.py`
-8. SLAM 실행 명령 생성: `python slam_nav2/02_slam_nav2_command_builder.py --ros-distro humble --mode turtlebot3`
+7. TF 좌표 변환 이해: `python shared/07_tf2_coordinate_transform_demo.py`
+8. LLM action sequence 검증: `python shared/08_mock_action_sequence_runner.py`
+9. SLAM/Nav2 점검: `python slam_nav2/01_slam_nav2_readiness_check.py`
+10. SLAM 실행 명령 생성: `python slam_nav2/02_slam_nav2_command_builder.py --ros-distro humble --mode turtlebot3`
+11. Occupancy grid 원리 확인: `python slam_nav2/04_occupancy_grid_toy.py`
+12. Nav2 실패 디버깅: `python slam_nav2/05_nav2_failure_debug_checklist.py`
+
+## 실습을 제대로 했는지 보는 기준
+
+각 실습은 실행 여부보다 `무엇을 확인했는가`가 중요합니다.
+
+| 실습 | 성공 기준 | 실패 시 먼저 볼 것 |
+|---|---|---|
+| 카메라 preview | 프레임이 안정적으로 표시됨 | 장치 경로, ribbon cable, libcamera/GStreamer |
+| 데이터 수집 | 이미지와 metadata가 함께 저장됨 | 출력 폴더 권한, 카메라 frame read |
+| YOLO | box/class/confidence 표시 | 모델 설치, 해상도, 추론 장치 |
+| Ollama | JSON action plan 출력 | Ollama server, model pull, allowed action 검증 |
+| TF demo | camera 좌표가 base 좌표로 변환됨 | frame 정의, yaw/translation 방향 |
+| SLAM | `/map`, `/scan`, TF가 RViz에 표시됨 | `/scan`, `/odom`, `map->odom->base_link` |
+| Nav2 | goal 전송 후 `/cmd_vel` 생성 | costmap, footprint, localization, behavior tree |
 
 ## SLAM 실습 전제
 
