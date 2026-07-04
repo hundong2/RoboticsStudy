@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#263238"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.16"/>
+    </filter>
+    <style>
+      .bg { fill: #f7f8fa; }
+      .title { font: 700 44px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif; fill: #1d2329; }
+      .subtitle { font: 400 20px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif; fill: #52616b; }
+      .stage { font: 700 22px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif; fill: #172026; }
+      .body { font: 400 16px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif; fill: #263238; }
+      .small { font: 400 14px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif; fill: #51606a; }
+      .pill { font: 700 14px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif; fill: #ffffff; }
+      .node { rx: 18; filter: url(#shadow); stroke-width: 2; }
+      .line { fill: none; stroke: #263238; stroke-width: 3; marker-end: url(#arrow); }
+      .softline { fill: none; stroke: #7d8b94; stroke-width: 2; stroke-dasharray: 8 8; marker-end: url(#arrow); }
+      .band { fill: #ffffff; stroke: #d8dee4; stroke-width: 1.5; rx: 22; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="1000"/>
+
+  <text class="title" x="80" y="80">Robotics Basic 전체 학습 로드맵</text>
+  <text class="subtitle" x="80" y="116">수학과 센서에서 시작해서 SLAM, ROS 2, Isaac Sim, VLM/VLA 로봇 학습까지 이어지는 입문 경로</text>
+
+  <rect class="band" x="70" y="150" width="1460" height="690"/>
+
+  <!-- Stage nodes -->
+  <rect class="node" x="110" y="210" width="250" height="140" fill="#e8f1ff" stroke="#5b8def"/>
+  <rect x="130" y="232" width="76" height="24" rx="12" fill="#3069c9"/>
+  <text class="pill" x="146" y="249">STEP 1</text>
+  <text class="stage" x="130" y="286">로봇 수학</text>
+  <text class="body" x="130" y="318">좌표계, SE(3), 확률</text>
+  <text class="body" x="130" y="342">Kalman Filter, 최적화</text>
+
+  <rect class="node" x="440" y="210" width="250" height="140" fill="#e9f7ef" stroke="#4aa96c"/>
+  <rect x="460" y="232" width="76" height="24" rx="12" fill="#2f8f55"/>
+  <text class="pill" x="476" y="249">STEP 2</text>
+  <text class="stage" x="460" y="286">센서와 인식</text>
+  <text class="body" x="460" y="318">Camera, LiDAR, IMU</text>
+  <text class="body" x="460" y="342">OpenCV, Detection, Segmentation</text>
+
+  <rect class="node" x="770" y="210" width="250" height="140" fill="#fff2df" stroke="#e09a3e"/>
+  <rect x="790" y="232" width="76" height="24" rx="12" fill="#c97916"/>
+  <text class="pill" x="806" y="249">STEP 3</text>
+  <text class="stage" x="790" y="286">SLAM</text>
+  <text class="body" x="790" y="318">Localization + Mapping</text>
+  <text class="body" x="790" y="342">Loop Closure, Pose Graph</text>
+
+  <rect class="node" x="1100" y="210" width="250" height="140" fill="#f2ecff" stroke="#8b63d9"/>
+  <rect x="1120" y="232" width="76" height="24" rx="12" fill="#6d49c7"/>
+  <text class="pill" x="1136" y="249">STEP 4</text>
+  <text class="stage" x="1120" y="286">ROS 2 시스템</text>
+  <text class="body" x="1120" y="318">Node, Topic, Service, Action</text>
+  <text class="body" x="1120" y="342">Launch, URDF, TF2</text>
+
+  <rect class="node" x="275" y="500" width="290" height="150" fill="#e6f6f7" stroke="#3aa4a8"/>
+  <rect x="295" y="522" width="76" height="24" rx="12" fill="#21868b"/>
+  <text class="pill" x="311" y="539">STEP 5</text>
+  <text class="stage" x="295" y="577">시뮬레이션</text>
+  <text class="body" x="295" y="609">Isaac Sim, Isaac Lab</text>
+  <text class="body" x="295" y="633">Synthetic Data, Sim-to-Real</text>
+
+  <rect class="node" x="690" y="500" width="290" height="150" fill="#fff0f4" stroke="#d95b7f"/>
+  <rect x="710" y="522" width="76" height="24" rx="12" fill="#c43d67"/>
+  <text class="pill" x="726" y="539">STEP 6</text>
+  <text class="stage" x="710" y="577">VLM / VLA</text>
+  <text class="body" x="710" y="609">Transformer, CLIP</text>
+  <text class="body" x="710" y="633">PaLM-E, RT-1, RT-2</text>
+
+  <rect class="node" x="1105" y="500" width="290" height="150" fill="#eef2f4" stroke="#60717c"/>
+  <rect x="1125" y="522" width="76" height="24" rx="12" fill="#455a64"/>
+  <text class="pill" x="1141" y="539">GOAL</text>
+  <text class="stage" x="1125" y="577">실무 프로젝트</text>
+  <text class="body" x="1125" y="609">Nav2 + MoveIt2 + Vision</text>
+  <text class="body" x="1125" y="633">Ollama/LLM + Imitation Learning</text>
+
+  <!-- Main arrows -->
+  <path class="line" d="M360 280 L430 280"/>
+  <path class="line" d="M690 280 L760 280"/>
+  <path class="line" d="M1020 280 L1090 280"/>
+  <path class="line" d="M1225 350 C1225 425 510 425 430 490"/>
+  <path class="line" d="M565 575 L680 575"/>
+  <path class="line" d="M980 575 L1095 575"/>
+
+  <!-- Supporting dependency arrows -->
+  <path class="softline" d="M560 350 C610 420 780 445 815 493"/>
+  <path class="softline" d="M895 350 C910 410 880 450 850 493"/>
+  <path class="softline" d="M420 650 C420 735 760 735 835 660"/>
+
+  <!-- Paper guide panel -->
+  <rect class="band" x="90" y="700" width="1390" height="105"/>
+  <text class="stage" x="120" y="738">중간에 읽을 필수 자료</text>
+  <text class="small" x="120" y="770">Probabilistic Robotics -> ORB-SLAM -> Attention Is All You Need -> CLIP -> PaLM-E -> RT-1 -> RT-2 -> Isaac Sim Docs</text>
+  <text class="small" x="120" y="795">각 자료는 Basic/papers/*.md에 한국어 학습 가이드와 원문 링크로 정리되어 있음</text>
+
+  <rect class="band" x="90" y="835" width="1390" height="95"/>
+  <text class="stage" x="120" y="872">사진 기반 3-4주 이론 수업 보강</text>
+  <text class="small" x="120" y="902">ROS2 기초 -> SLAM/Nav2 -> MoveIt2 -> OMX 모방학습 -> OpenCV/YOLO + Ollama -> MVP 인지/자연어 명령 연동</text>
+
+  <!-- Bottom notes -->
+  <text class="subtitle" x="90" y="970">읽는 방식: 얇게 한 바퀴 -> SLAM/ROS 2 실습 -> Isaac Sim/MoveIt2 연결 -> VLM/VLA/LLM으로 확장</text>
+</svg>
