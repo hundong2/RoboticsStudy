@@ -1,0 +1,17 @@
+[
+  {
+    "topic": "binary search boundary handling",
+    "easy_angle": "Ask for the definition of binary search.",
+    "hard_angle": "Ask about off-by-one errors when using inclusive and exclusive bounds."
+  },
+  {
+    "topic": "support vector machine margin",
+    "easy_angle": "Ask what SVM stands for.",
+    "hard_angle": "Ask why maximizing margin is equivalent to minimizing ||w|| under canonical constraints."
+  },
+  {
+    "topic": "HOG block normalization",
+    "easy_angle": "Ask what HOG means.",
+    "hard_angle": "Ask why block-level L2-Hys normalization improves robustness to contrast changes."
+  }
+]

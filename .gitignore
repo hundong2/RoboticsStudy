@@ -33,3 +33,4 @@ publish/
 .fake
 
 temp/
+.codex-remote-sattachments/*s
