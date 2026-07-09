@@ -1,0 +1,13 @@
+torch
+torchaudio
+transformers
+datasets
+evaluate
+jiwer
+librosa
+soundfile
+opencv-python
+pytesseract
+easyocr
+sentence-transformers
+mlflow
