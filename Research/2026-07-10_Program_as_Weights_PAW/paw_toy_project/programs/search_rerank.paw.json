@@ -1,0 +1,63 @@
+{
+  "slug": "search_rerank",
+  "spec": "Given a search query and candidate result, classify relevance for semantic reranking.",
+  "pseudo_program": {
+    "task": "Rate whether a candidate search result satisfies the query intent.",
+    "labels": [
+      "exact_match",
+      "highly_relevant",
+      "somewhat_relevant",
+      "not_relevant"
+    ],
+    "examples": [
+      {
+        "input": "query=opencv install candidate=OpenCV build guide",
+        "output": "highly_relevant"
+      },
+      {
+        "input": "query=svm margin candidate=recipe blog",
+        "output": "not_relevant"
+      }
+    ],
+    "notes": "Respect constraints and exclusions. Prefer exact_match only when the candidate directly answers the query."
+  },
+  "weights": {
+    "exact_match": {
+      "exact": 1.0,
+      "official": 1.0,
+      "guide": 1.0,
+      "reference": 1.0,
+      "documentation": 1.0
+    },
+    "highly_relevant": {
+      "install": 1.35,
+      "build": 1.35,
+      "tutorial": 1.0,
+      "paper": 1.0,
+      "implementation": 1.0,
+      "query": 0.35,
+      "opencv": 0.7,
+      "candidate": 0.35,
+      "guide": 0.35
+    },
+    "somewhat_relevant": {
+      "overview": 1.0,
+      "intro": 1.0,
+      "related": 1.0,
+      "summary": 1.0
+    },
+    "not_relevant": {
+      "recipe": 1.35,
+      "travel": 1.0,
+      "movie": 1.0,
+      "unrelated": 1.0,
+      "blog": 1.35,
+      "query": 0.35,
+      "svm": 0.35,
+      "margin": 0.35,
+      "candidate": 0.35
+    }
+  },
+  "default_label": "not_relevant",
+  "version": 1
+}

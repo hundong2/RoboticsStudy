@@ -1,0 +1,52 @@
+{
+  "slug": "log_monitor",
+  "spec": "Classify log lines. Return ALERT only when the line is worth interrupting the developer.",
+  "pseudo_program": {
+    "task": "Classify log lines as alert-worthy or quiet.",
+    "labels": [
+      "ALERT",
+      "QUIET"
+    ],
+    "examples": [
+      {
+        "input": "Traceback most recent call last",
+        "output": "ALERT"
+      },
+      {
+        "input": "[step 100] loss=0.05 lr=0.0001",
+        "output": "QUIET"
+      }
+    ],
+    "notes": "Alert on errors, crashes, checkpoint completion, training completion, or blocked states."
+  },
+  "weights": {
+    "ALERT": {
+      "traceback": 1.35,
+      "error": 1.0,
+      "failed": 1.0,
+      "exception": 1.0,
+      "complete": 1.0,
+      "checkpoint": 1.0,
+      "blocked": 1.0,
+      "crash": 1.0,
+      "most": 0.35,
+      "recent": 0.35,
+      "call": 0.35,
+      "last": 0.35
+    },
+    "QUIET": {
+      "loss": 1.35,
+      "lr": 1.35,
+      "step": 1.35,
+      "epoch": 1.0,
+      "progress": 1.0,
+      "debug": 1.0,
+      "100": 0.35,
+      "0": 0.7,
+      "05": 0.35,
+      "0001": 0.35
+    }
+  },
+  "default_label": "QUIET",
+  "version": 1
+}

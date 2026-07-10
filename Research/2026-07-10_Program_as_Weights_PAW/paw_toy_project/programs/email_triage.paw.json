@@ -1,0 +1,51 @@
+{
+  "slug": "email_triage",
+  "spec": "Classify if this email requires immediate attention. Return urgent or normal.",
+  "pseudo_program": {
+    "task": "Classify whether a message requires immediate attention.",
+    "labels": [
+      "urgent",
+      "normal"
+    ],
+    "examples": [
+      {
+        "input": "Need your signature by EOD.",
+        "output": "urgent"
+      },
+      {
+        "input": "Sharing the slides for next month.",
+        "output": "normal"
+      }
+    ],
+    "notes": "Return only one label. Prefer urgent when there is a deadline, blocker, outage, or approval needed today."
+  },
+  "weights": {
+    "urgent": {
+      "eod": 1.35,
+      "today": 1.0,
+      "blocked": 1.0,
+      "asap": 1.0,
+      "signature": 1.35,
+      "approval": 1.0,
+      "deadline": 1.0,
+      "outage": 1.0,
+      "need": 0.35,
+      "your": 0.35,
+      "by": 0.35
+    },
+    "normal": {
+      "sharing": 1.35,
+      "next": 1.35,
+      "later": 1.0,
+      "reference": 1.0,
+      "newsletter": 1.0,
+      "optional": 1.0,
+      "the": 0.35,
+      "slides": 0.35,
+      "for": 0.35,
+      "month": 0.35
+    }
+  },
+  "default_label": "normal",
+  "version": 1
+}
