@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- package.xml은 ROS 패키지의 이름, 버전, 의존성을 설명하는 메타데이터 파일입니다. -->
+<package format="3">
+  <!-- name은 ROS가 패키지를 찾을 때 사용하는 고유한 이름입니다. -->
+  <name>hello_robot_py</name>
+
+  <!-- version은 사람이 읽는 패키지 버전입니다. 학습용이라 0.1.0으로 시작합니다. -->
+  <version>0.1.0</version>
+
+  <!-- description은 패키지 목적을 짧게 설명합니다. -->
+  <description>Comment-heavy ROS 2 Python examples for beginner ROS learners.</description>
+
+  <!-- maintainer는 패키지 관리자 정보입니다. 실제 프로젝트에서는 실제 이메일을 넣습니다. -->
+  <maintainer email="study@example.com">RoboticsStudy</maintainer>
+
+  <!-- license는 코드 사용 조건입니다. 저장소가 MIT이므로 예제도 MIT로 둡니다. -->
+  <license>MIT</license>
+
+  <!-- buildtool_depend는 빌드 시스템 의존성입니다. ament_python은 Python 패키지 빌드에 사용됩니다. -->
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <!-- exec_depend는 실행할 때 필요한 ROS 패키지입니다. -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+
+  <!-- export는 빌드 도구가 이 패키지의 빌드 타입을 알 수 있게 합니다. -->
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

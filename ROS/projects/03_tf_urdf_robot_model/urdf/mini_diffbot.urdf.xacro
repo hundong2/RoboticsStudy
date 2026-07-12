@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!--
+  xacro 파일은 XML에 변수와 매크로 기능을 더한 ROS 로봇 모델 파일입니다.
+  이 예제는 초보자가 link와 joint 관계를 읽을 수 있도록 단순하게 구성했습니다.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mini_diffbot">
+  <!-- xacro:property는 반복해서 쓰는 값을 변수처럼 저장합니다. -->
+  <xacro:property name="wheel_radius" value="0.05" />
+  <xacro:property name="wheel_width" value="0.02" />
+  <xacro:property name="base_length" value="0.32" />
+  <xacro:property name="base_width" value="0.22" />
+  <xacro:property name="base_height" value="0.08" />
+
+  <!-- base_link는 로봇 몸체의 기준 link입니다. -->
+  <link name="base_link">
+    <!-- visual은 RViz나 Gazebo에서 보이는 모양입니다. -->
+    <visual>
+      <!-- origin은 이 시각 요소가 link 기준 어디에 있는지 표현합니다. -->
+      <origin xyz="0 0 0.04" rpy="0 0 0" />
+      <!-- geometry는 모양입니다. box는 직육면체입니다. -->
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}" />
+      </geometry>
+      <!-- material은 색상입니다. rgba는 red, green, blue, alpha입니다. -->
+      <material name="blue">
+        <color rgba="0.1 0.2 0.8 1.0" />
+      </material>
+    </visual>
+  </link>
+
+  <!-- 왼쪽 바퀴 link입니다. -->
+  <link name="left_wheel_link">
+    <visual>
+      <!-- 원통 cylinder는 기본 축이 z축이므로 바퀴처럼 보이게 rpy로 회전합니다. -->
+      <origin xyz="0 0 0" rpy="1.5708 0 0" />
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+      </geometry>
+      <material name="black">
+        <color rgba="0.02 0.02 0.02 1.0" />
+      </material>
+    </visual>
+  </link>
+
+  <!-- 오른쪽 바퀴 link입니다. -->
+  <link name="right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0" />
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+      </geometry>
+      <material name="black" />
+    </visual>
+  </link>
+
+  <!-- laser_link는 2D LiDAR 센서 기준 좌표계입니다. -->
+  <link name="laser_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.04" length="0.03" />
+      </geometry>
+      <material name="green">
+        <color rgba="0.0 0.7 0.2 1.0" />
+      </material>
+    </visual>
+  </link>
+
+  <!-- camera_link는 카메라 센서 기준 좌표계입니다. -->
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.04 0.03 0.03" />
+      </geometry>
+      <material name="red">
+        <color rgba="0.8 0.1 0.1 1.0" />
+      </material>
+    </visual>
+  </link>
+
+  <!-- continuous joint는 계속 회전할 수 있는 바퀴 축에 사용합니다. -->
+  <joint name="left_wheel_joint" type="continuous">
+    <!-- parent는 기준이 되는 link입니다. -->
+    <parent link="base_link" />
+    <!-- child는 parent에 붙는 link입니다. -->
+    <child link="left_wheel_link" />
+    <!-- origin은 child link가 parent link 기준 어디에 붙는지 표현합니다. -->
+    <origin xyz="0 0.12 0.03" rpy="0 0 0" />
+    <!-- axis는 joint가 회전하는 축입니다. -->
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link" />
+    <child link="right_wheel_link" />
+    <origin xyz="0 -0.12 0.03" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <!-- fixed joint는 움직이지 않는 센서 장착 위치에 사용합니다. -->
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_link" />
+    <origin xyz="0.08 0 0.12" rpy="0 0 0" />
+  </joint>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="camera_link" />
+    <origin xyz="0.16 0 0.11" rpy="0 0 0" />
+  </joint>
+</robot>
