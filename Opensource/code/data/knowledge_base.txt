@@ -1,0 +1,9 @@
+# id|title|text
+llama_cpp|llama.cpp overview|llama.cpp is an open source C and C++ project for local LLM inference. It is useful for studying C++17, CMake, GGUF model loading, tokenization, quantization, logits, sampling, and CPU GPU backends.
+cpp17|C++17 study points|C++17 study should include std::filesystem, std::optional, structured binding, lambdas, algorithms, RAII, move semantics, and clear module boundaries. llama.cpp gives real examples of build configuration and performance oriented C++.
+rag|RAG basic idea|Retrieval augmented generation, or RAG, searches relevant documents before asking a language model to answer. A small implementation can use TF-IDF vectors, cosine similarity, and prompt construction before moving to neural embeddings.
+sampling|LLM sampling|LLM inference produces logits for candidate tokens. Sampling converts logits into probabilities with softmax, then changes randomness with temperature, top-k, or top-p. This is a good place to practice numeric code in C++17.
+gguf|GGUF and quantization|GGUF is a model file format commonly used with llama.cpp. Quantization stores model weights with fewer bits to reduce memory use and improve speed, with a tradeoff between quality and resource usage.
+build|Build workflow|A practical llama.cpp workflow starts with a CPU build through CMake, then optional acceleration such as CUDA or Vulkan. First make the simple build work, then add GPU options and compare speed and memory usage.
+server|Server mode|llama.cpp includes server tooling that can expose local models through HTTP style APIs. This is useful after learning command line inference because applications can send prompts and receive generated text programmatically.
+korean|Korean note|한국어로 학습할 때도 핵심 키워드는 C++17, llama.cpp, GGUF, quantization, sampling, RAG, CMake처럼 영어 원어를 함께 적어두면 검색과 코드 읽기가 쉬워진다.
