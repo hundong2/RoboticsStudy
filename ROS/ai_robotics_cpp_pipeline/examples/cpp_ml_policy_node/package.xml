@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- package.xml은 ROS 2 패키지의 이름, 버전, 의존성을 설명하는 메타데이터입니다. -->
+<package format="3">
+  <!-- name은 colcon과 ros2 CLI가 패키지를 찾을 때 사용하는 고유 이름입니다. -->
+  <name>cpp_ml_policy_node</name>
+
+  <!-- version은 사람이 읽는 패키지 버전입니다. -->
+  <version>0.1.0</version>
+
+  <!-- description은 패키지 목적을 짧게 설명합니다. -->
+  <description>C++ ROS 2 machine-learning policy node examples with beginner comments.</description>
+
+  <!-- maintainer는 패키지 관리자를 나타냅니다. -->
+  <maintainer email="study@example.com">RoboticsStudy</maintainer>
+
+  <!-- license는 코드 사용 조건입니다. -->
+  <license>MIT</license>
+
+  <!-- ament_cmake는 C++ ROS 2 패키지에서 흔히 쓰는 빌드 도구입니다. -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- rclcpp는 ROS 2 C++ 클라이언트 라이브러리입니다. -->
+  <depend>rclcpp</depend>
+
+  <!-- sensor_msgs에는 LaserScan, Image 같은 센서 메시지가 들어 있습니다. -->
+  <depend>sensor_msgs</depend>
+
+  <!-- geometry_msgs에는 Twist 같은 이동 명령 메시지가 들어 있습니다. -->
+  <depend>geometry_msgs</depend>
+
+  <!-- std_msgs에는 Bool, String 같은 간단한 메시지가 들어 있습니다. -->
+  <depend>std_msgs</depend>
+
+  <!-- export는 빌드 타입을 ROS 도구에 알려줍니다. -->
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

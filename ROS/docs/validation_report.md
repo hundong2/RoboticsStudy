@@ -96,3 +96,61 @@ python ROS/scripts/validate_ros_learning_materials.py
 - [13_simulation_without_robot.md](13_simulation_without_robot.md)에 무료 또는 무료로 시작 가능한 프레임워크 비교와 선택 기준을 추가했습니다.
 - [06_robotless_simulation_lab](../projects/06_robotless_simulation_lab/README.md)에 Gazebo, Webots, Isaac Sim, MuJoCo/PyBullet/Drake, CARLA 실습 루트를 추가했습니다.
 - 로봇이 없는 학습자는 Gazebo/Webots로 ROS 2와 Nav2를 먼저 익히고, GPU AI/합성데이터는 Isaac Sim, 동역학/RL은 MuJoCo/PyBullet/Drake, 차량 자율주행은 CARLA로 확장할 수 있습니다.
+
+## 추가 개선 검증: 딥러닝 로봇 정책 학습 연구 트랙
+
+결과: 통과
+
+```text
+[PASS] required files: all required files exist
+[PASS] markdown links: all local markdown links resolve
+[PASS] root README link: root README links to ROS/README.md
+[PASS] curriculum keywords: all key topics covered
+[PASS] python syntax: all Python files parse
+[PASS] code comments: learning code has dense beginner comments
+```
+
+검증 기준:
+
+- `ROS/robot_learning/` 아래에 카테고리별 폴더 hierarchy가 있어야 합니다.
+- Imitation Learning, Reinforcement Learning, Behavior Cloning, Offline RL, Diffusion, Flow Matching, VAE를 단계별로 다뤄야 합니다.
+- Visual Navigation, Long-Horizon/Mapless Navigation, Topological Map/Memory, VLA, World Model, 3D Gaussian Splatting을 포함해야 합니다.
+- CARLA/Isaac Sim closed-loop 평가, sim-to-real, ONNX Runtime/TensorRT 온디바이스 최적화, 학회 논문 활동까지 연결되어야 합니다.
+
+판단:
+
+- [robot_learning/README.md](../robot_learning/README.md)에 24주 강의 계획, 매일 학습 루틴, 평가 루브릭, 필수 프로젝트를 추가했습니다.
+- 각 카테고리 폴더에는 강의 목표, 데일리 실습, 과제, 통과 기준을 포함했습니다.
+- 초보자는 foundations와 PyTorch pipeline에서 시작하고, 중급자는 BC/RL/생성 모델을 구현하며, 고급자는 Visual Navigation/VLA/closed-loop/sim-to-real/온디바이스 최적화/논문 활동으로 확장합니다.
+
+## 추가 개선 검증: AI 로봇 C++/ROS2 실무 파이프라인
+
+결과: 통과
+
+```text
+[PASS] required files: all required files exist
+[PASS] markdown links: all local markdown links resolve
+[PASS] root README link: root README links to ROS/README.md
+[PASS] curriculum keywords: all key topics covered
+[PASS] python syntax: all Python files parse
+[PASS] code comments: learning code has dense beginner comments
+```
+
+전용 검증:
+
+```text
+[PASS] required files: all required files exist
+[PASS] markdown links: all local markdown links resolve
+[PASS] glossary anchors: all glossary anchors resolve
+[PASS] required glossary terms: all required terms exist
+[PASS] keyword coverage: all requested topics covered
+[PASS] python syntax: all Python examples parse
+[PASS] cpp comment density: C++ examples are heavily commented
+```
+
+판단:
+
+- [ai_robotics_cpp_pipeline/README.md](../ai_robotics_cpp_pipeline/README.md)에 ROS 생태계, C++ ML 추론, 무로봇 시뮬레이션, LLM Agent, 실제 로봇 테스트, 임베디드 최적화 파이프라인을 추가했습니다.
+- [ai_robotics_cpp_pipeline/glossary/README.md](../ai_robotics_cpp_pipeline/glossary/README.md)에 초보자가 용어를 사전처럼 찾아볼 수 있는 링크 구조를 추가했습니다.
+- [ml_policy_node.cpp](../ai_robotics_cpp_pipeline/examples/cpp_ml_policy_node/src/ml_policy_node.cpp)와 [safety_filter.cpp](../ai_robotics_cpp_pipeline/examples/cpp_ml_policy_node/src/safety_filter.cpp)에 라인 단위 주석을 추가했습니다.
+- 전용 검증 스크립트를 3회 실행해 사전 링크, 필수 용어, 요청 키워드, Python 문법, C++ 주석 밀도를 확인했습니다.

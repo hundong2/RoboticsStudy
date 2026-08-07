@@ -12,6 +12,8 @@
 | 코드 주석 | 코드가 초보자 문법 설명을 충분히 포함하는가? | Python 파일 comment/docstring 비율 확인 |
 | 최신성 | 2026 최신 ROS 2 흐름이 반영됐는가? | Lyrical, Jazzy, Kilted, Zenoh, zero-copy, Physical AI 언급 확인 |
 | 무로봇 실습 | 실제 로봇이 없어도 학습 가능한가? | Gazebo, Webots, Isaac Sim, MuJoCo, PyBullet, Drake, CoppeliaSim, CARLA 실습 경로 확인 |
+| 정책 학습 심화 | 채용 요건의 딥러닝 로봇 정책 학습 역량을 단계별로 다루는가? | Imitation Learning, RL, Offline RL, Behavior Cloning, 생성 모델, VLA, Visual Navigation, sim-to-real, ONNX/TensorRT 항목 확인 |
+| AI 로봇 C++ 실무 | C++ ML 추론 노드, LLM Agent, 무로봇 시뮬레이션, 실제 로봇 테스트, 임베디드 최적화를 한 파이프라인으로 설명하는가? | `ai_robotics_cpp_pipeline` 구조, glossary 링크, C++ 주석 밀도, 3회 검증 리포트 확인 |
 | 평가 가능성 | 전문가 수준 도달 여부를 판단할 기준이 있는가? | capstone, checklist, validation docs 확인 |
 | 저장소 연결 | 최상단 README Todo에 ROS 링크가 있는가? | root README 링크 검사 |
 

@@ -1,0 +1,19 @@
+ml_policy_node:
+  ros__parameters:
+    scan_topic: "/scan"
+    raw_command_topic: "/policy/cmd_vel_raw"
+    model_path: "policy.onnx"
+    max_forward_speed: 0.25
+    max_turn_speed: 0.6
+    obstacle_stop_distance: 0.45
+    dry_run: false
+
+safety_filter:
+  ros__parameters:
+    raw_command_topic: "/policy/cmd_vel_raw"
+    safe_command_topic: "/cmd_vel"
+    scan_topic: "/scan"
+    max_forward_speed: 0.20
+    max_turn_speed: 0.5
+    hard_stop_distance: 0.35
+    dry_run: false

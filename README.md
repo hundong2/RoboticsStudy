@@ -2,7 +2,7 @@
 
 ## Todo 
 
-- [ ] [ROS 기초부터 최신 트렌드까지 실습 커리큘럼](./ROS/README.md) - ROS 2 Lyrical/Jazzy/Kilted 기준의 입문-전문가 로드맵, 무로봇 시뮬레이션 실습, 3회 검증 계획
+- [ ] [ROS 기초부터 최신 트렌드까지 실습 커리큘럼](./ROS/README.md) - ROS 2 로드맵, 무로봇 시뮬레이션, 딥러닝 로봇 정책 학습, AI 로봇 C++/ROS2 실무 파이프라인, 3회 검증 계획
 
 - [ ] [LLM/VLM 용어집](./Research/용어집/README.md)
 

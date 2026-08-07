@@ -55,6 +55,36 @@
 - [projects/05_capstone_autonomous_inspection](projects/05_capstone_autonomous_inspection/README.md): 전문가 수준 검증을 위한 통합 프로젝트입니다.
 - [projects/06_robotless_simulation_lab](projects/06_robotless_simulation_lab/README.md): 실제 로봇 없이 Gazebo, Webots, Isaac Sim, MuJoCo, PyBullet, Drake, CARLA를 선택해 실습하는 가이드입니다.
 
+## 딥러닝 로봇 정책 학습 심화 트랙
+
+채용 요건에 맞춘 연구형 커리큘럼은 [robot_learning/README.md](robot_learning/README.md)에 정리했습니다.
+
+- [00_foundations](robot_learning/00_foundations/README.md): Python, tensor, 확률, 좌표계, 로봇 데이터 기초
+- [01_pytorch_pipeline](robot_learning/01_pytorch_pipeline/README.md): PyTorch Dataset/DataLoader/model/loss/checkpoint 학습 파이프라인
+- [02_policy_learning_il_bc](robot_learning/02_policy_learning_il_bc/README.md): Imitation Learning, Behavior Cloning, ACT, Diffusion Policy, VQ-BeT
+- [03_rl_offline_rl](robot_learning/03_rl_offline_rl/README.md): Reinforcement Learning, Offline RL, dataset shift, conservative learning
+- [04_generative_models](robot_learning/04_generative_models/README.md): VAE, diffusion, flow matching, action generation
+- [05_visual_navigation_memory](robot_learning/05_visual_navigation_memory/README.md): Visual Navigation, Long-Horizon/Mapless Navigation, Topological Map/Memory
+- [06_vla_world_models_generative_sim](robot_learning/06_vla_world_models_generative_sim/README.md): VLA, World Model, 3D Gaussian Splatting, 생성형 시뮬레이션
+- [07_simulators_closed_loop](robot_learning/07_simulators_closed_loop/README.md): CARLA, Isaac Sim, Gazebo/Webots closed-loop 평가
+- [08_sim_to_real_deployment](robot_learning/08_sim_to_real_deployment/README.md): 실제 로봇 배포와 sim-to-real gap 대응
+- [09_on_device_inference](robot_learning/09_on_device_inference/README.md): ONNX Runtime, TensorRT, 온디바이스 latency 최적화
+- [10_research_publication](robot_learning/10_research_publication/README.md): CVPR/ICCV/ECCV/NeurIPS/CoRL/ICRA/IROS 논문 읽기와 연구 설계
+- [11_capstone](robot_learning/11_capstone/README.md): Visual Navigation Policy 캡스톤 연구 프로젝트
+- [daily_practice](robot_learning/daily_practice/README.md): 매일 실습 운영표와 12주 압축 루트
+
+## AI 로봇 C++/ROS2 실무 파이프라인
+
+로봇 장비가 없는 환경에서 C++ 머신러닝 추론 노드와 로봇 제어 파이프라인을 시뮬레이션으로 검증하고, 이후 실제 로봇에 안전하게 배포하는 실무 가이드는 [ai_robotics_cpp_pipeline/README.md](ai_robotics_cpp_pipeline/README.md)에 정리했습니다.
+
+- [ROS 생태계 이론](ai_robotics_cpp_pipeline/docs/01_ros_ecosystem_theory.md): ROS 2 통신, 제어, 시뮬레이션, AI 계층의 큰 그림
+- [C++ ML 로봇 파이프라인](ai_robotics_cpp_pipeline/docs/02_cpp_ml_robot_pipeline.md): PyTorch -> ONNX -> C++ ROS 2 추론 노드 흐름
+- [로봇 없는 시뮬레이션 테스트](ai_robotics_cpp_pipeline/docs/03_no_robot_simulation_testing.md): Gazebo, Isaac Sim, PyBullet, MuJoCo 기반 closed-loop 테스트
+- [LLM Agent 로봇 응용](ai_robotics_cpp_pipeline/docs/04_llm_agent_robot_apps.md): LangChain, LlamaIndex, RAG, 스크립트 자동생성의 안전 구조
+- [실제 로봇 테스트 파이프라인](ai_robotics_cpp_pipeline/docs/05_real_robot_testing_pipeline.md): dry-run, 저속 테스트, safety filter, rollback
+- [임베디드 추론 최적화](ai_robotics_cpp_pipeline/docs/06_embedded_optimization.md): ONNX Runtime, TensorRT, p99 latency 측정
+- [용어 사전](ai_robotics_cpp_pipeline/glossary/README.md): 문서 안의 ROS/AI/시뮬레이터 용어를 사전 형태로 정리
+
 ## 검증 자료
 
 - [검증 계획](docs/validation_plan.md)
@@ -76,3 +106,12 @@
 - Isaac Sim ROS 2 Bridge: <https://docs.isaacsim.omniverse.nvidia.com/6.0.0/installation/install_ros.html>
 - MuJoCo: <https://mujoco.org/>
 - CARLA ROS bridge: <https://carla.readthedocs.io/projects/ros-bridge/en/latest/run_ros/>
+- PyTorch Tutorials: <https://docs.pytorch.org/tutorials/>
+- Hugging Face LeRobot: <https://huggingface.co/docs/lerobot/en/index>
+- Diffusion Policy: <https://arxiv.org/abs/2303.04137>
+- ViNT: <https://arxiv.org/abs/2306.14846>
+- NoMaD: <https://arxiv.org/abs/2310.07896>
+- LangChain Agents: <https://docs.langchain.com/oss/python/langchain/agents>
+- LlamaIndex: <https://www.llamaindex.ai/>
+- ONNX Runtime: <https://onnxruntime.ai/docs/>
+- NVIDIA TensorRT: <https://docs.nvidia.com/deeplearning/tensorrt/latest/index.html>
