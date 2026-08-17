@@ -4,6 +4,32 @@ Jetson Orin Nano Super에서 비전 추론을 수행하고, 서버에서 장치�
 
 > 현재 단계는 **MVP 기반 골격**입니다. 합성 카메라/탐지기로 전체 파이프라인과 서버 수집을 먼저 검증하고, 실제 CSI/USB 카메라·TensorRT·WebRTC 구현을 어댑터로 교체합니다.
 
+## 처음 보는 분은 여기부터
+
+로봇 비전이나 Jetson이 처음이라면 전체 문서를 한 번에 이해할 필요가 없습니다.
+
+1. [초보자 시작 가이드](docs/getting-started-for-beginners.md)를 따라 서버를 실행합니다.
+2. 브라우저에서 장치가 표시되는 것을 확인합니다.
+3. [용어집](docs/glossary.md)에서 낯선 단어만 찾아봅니다.
+4. 이후 관심 분야에 따라 `tips`, `device`, `server` 문서로 이동합니다.
+
+### 지금 바로 할 수 있는 것
+
+- .NET 서버 실행과 health check
+- 예제 탐지 이벤트 전송
+- 웹 화면에서 장치 ID, 모델 버전, 탐지 결과 확인
+- 합성 카메라를 사용하는 C++20 파이프라인 빌드와 테스트
+
+### 아직 구현되지 않은 것
+
+- Jetson CSI/USB 카메라의 실제 프레임 입력
+- TensorRT 모델의 실제 객체 탐지
+- WebRTC 실시간 영상 재생
+- gRPC/mTLS 장치 연결과 자동 모델 업데이트
+- VLM/VLA 분석과 로봇 동작 명령
+
+이 기능들은 오류가 아니라 아래 TODO에 따라 구현할 다음 단계입니다.
+
 ## 목표 아키텍처
 
 ```text
@@ -85,7 +111,9 @@ RobotVisionPlatform/
 dotnet run --project server/src/RobotVision.Server.Api
 ```
 
-서버 실행 후 `http://localhost:5080`, health check는 `/health`, 장치 목록은 `/api/devices`입니다. 장치 데모는 별도 터미널에서 `device/build/robot_vision_device --device-id jetson-dev-001`로 실행합니다. Boost HTTP adapter를 빌드했다면 `--server-host 127.0.0.1 --server-port 5080`을 더해 MVP end-to-end 전송을 확인할 수 있습니다.
+명령은 `RobotVisionPlatform` 폴더에서 실행합니다. 자세한 준비물과 예상 결과는 [초보자 시작 가이드](docs/getting-started-for-beginners.md)에 있습니다.
+
+서버 실행 후 `http://localhost:5080`, health check는 `/health`, 장치 목록은 `/api/devices`입니다. 장치 데모는 별도 터미널에서 실행합니다. Linux/Ninja는 `device/build/robot_vision_device`, Visual Studio generator는 보통 `device/build/Release/robot_vision_device.exe`에 생성됩니다. Boost HTTP adapter를 빌드했다면 `--server-host 127.0.0.1 --server-port 5080`을 더해 MVP end-to-end 전송을 확인할 수 있습니다.
 
 ## 설계 문서
 
@@ -96,6 +124,9 @@ dotnet run --project server/src/RobotVision.Server.Api
 - [모델 수명주기](docs/model-lifecycle.md)
 - [보안 및 운영](docs/security-and-operations.md)
 - [학습 팁 인덱스](tips/README.md)
+- [초보자 시작 가이드](docs/getting-started-for-beginners.md)
+- [용어집](docs/glossary.md)
+- [문제 해결](docs/troubleshooting.md)
 
 ## 기술 기준
 
