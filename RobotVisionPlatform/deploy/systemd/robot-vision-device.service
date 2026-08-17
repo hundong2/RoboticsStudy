@@ -1,0 +1,24 @@
+[Unit]
+Description=Robot Vision Edge Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=robotvision
+Group=robotvision
+SupplementaryGroups=video render
+ExecStart=/opt/robot-vision/bin/robot_vision_device --device-id jetson-dev-001
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+StateDirectory=robot-vision
+LogsDirectory=robot-vision
+DeviceAllow=/dev/video0 rw
+EnvironmentFile=-/etc/robot-vision/environment
+
+[Install]
+WantedBy=multi-user.target

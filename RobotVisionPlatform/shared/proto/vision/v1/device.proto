@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package robotvision.vision.v1;
+option csharp_namespace = "RobotVision.Contracts.Grpc.V1";
+
+import "google/protobuf/timestamp.proto";
+
+service DeviceControl {
+  rpc Connect(stream DeviceEnvelope) returns (stream ServerCommand);
+}
+
+message DeviceEnvelope {
+  string device_id = 1;
+  uint64 sequence = 2;
+  google.protobuf.Timestamp sent_at = 3;
+  oneof payload {
+    Heartbeat heartbeat = 10;
+    DetectionBatch detections = 11;
+    ModelState model_state = 12;
+  }
+}
+
+message Heartbeat {
+  double capture_fps = 1;
+  double inference_fps = 2;
+  double temperature_c = 3;
+  uint64 dropped_frames = 4;
+  string software_version = 5;
+}
+
+message DetectionBatch {
+  google.protobuf.Timestamp captured_at = 1;
+  string model_version = 2;
+  repeated Detection items = 3;
+}
+
+message Detection {
+  string label = 1;
+  float confidence = 2;
+  float x = 3;
+  float y = 4;
+  float width = 5;
+  float height = 6;
+  uint64 track_id = 7;
+}
+
+message ModelState {
+  string model_id = 1;
+  string version = 2;
+  string sha256 = 3;
+  string status = 4;
+}
+
+message ServerCommand {
+  string command_id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  oneof payload {
+    UpdateConfiguration update_configuration = 10;
+    DeployModel deploy_model = 11;
+    RequestKeyframe request_keyframe = 12;
+  }
+}
+
+message UpdateConfiguration { string json_merge_patch = 1; }
+message DeployModel {
+  string manifest_uri = 1;
+  string manifest_sha256 = 2;
+  string signature = 3;
+}
+message RequestKeyframe { string reason = 1; }
+

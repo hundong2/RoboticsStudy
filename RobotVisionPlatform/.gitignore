@@ -1,0 +1,11 @@
+device/build*/
+device/stage/
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.log
+.env
+secrets/
+models/*.engine

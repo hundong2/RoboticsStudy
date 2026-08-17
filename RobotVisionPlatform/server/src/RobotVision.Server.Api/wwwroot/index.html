@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Robot Vision Monitor</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #0a1020; color: #e7ecf5; }
+    header { padding: 22px 28px; border-bottom: 1px solid #27324a; }
+    main { padding: 24px 28px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); }
+    .card { padding: 18px; border: 1px solid #27324a; border-radius: 12px; background: #111a2d; }
+    .muted { color: #92a1ba; } .ok { color: #58d68d; }
+    ul { padding-left: 20px; } code { color: #69d2ff; }
+  </style>
+</head>
+<body>
+  <header><h1>Robot Vision Monitor</h1><div class="muted">MVP device registry · refreshes every 2 seconds</div></header>
+  <main id="devices"><div class="card">장치 이벤트를 기다리는 중…</div></main>
+  <script>
+    const root = document.querySelector('#devices');
+    const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    async function refresh() {
+      try {
+        const response = await fetch('/api/devices');
+        const devices = await response.json();
+        root.innerHTML = devices.length ? devices.map(d => `<section class="card">
+          <h2>${esc(d.deviceId)}</h2><div class="ok">online / last seen ${esc(d.lastSeenAt)}</div>
+          <p>sequence <code>${d.lastSequence}</code> · model <code>${esc(d.modelVersion)}</code></p>
+          <ul>${d.detections.map(x => `<li>${esc(x.label)} ${(x.confidence * 100).toFixed(1)}%</li>`).join('') || '<li class="muted">no detections</li>'}</ul>
+        </section>`).join('') : '<div class="card">장치 이벤트를 기다리는 중…</div>';
+      } catch { root.innerHTML = '<div class="card">서버 연결 실패</div>'; }
+    }
+    refresh(); setInterval(refresh, 2000);
+  </script>
+</body>
+</html>
+
