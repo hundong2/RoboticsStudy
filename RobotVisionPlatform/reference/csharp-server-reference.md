@@ -155,4 +155,3 @@ logger.LogError(error, "Failed for {DeviceId}", deviceId);
 ## MAUI `MauiApp.CreateBuilder()`와 `BlazorWebView`
 
 `MauiApp.CreateBuilder()`는 native application, DI, logging을 구성합니다. `AddMauiBlazorWebView()`는 Razor component를 native WebView 안에서 실행할 service를 등록합니다. 현재 앱은 골격이며 SignalR/WebRTC 연결은 다음 단계입니다.
-

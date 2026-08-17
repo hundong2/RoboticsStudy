@@ -35,4 +35,3 @@
 - `주의`: 이 프로젝트에서 자주 발생할 수 있는 실수
 
 코드 동작의 전체 흐름은 [시스템 아키텍처](../docs/architecture.md), 모델 배포 흐름은 [Device 모델 배포 가이드](../device/guides/README.md)를 함께 참고합니다.
-

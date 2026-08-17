@@ -184,4 +184,3 @@ void HandleSignal(int) { running = 0; }
 ```
 
 signal handler 안에서는 logging, allocation, mutex 같은 일반 함수를 호출하면 안전하지 않을 수 있습니다. handler는 flag만 바꾸고 정상 thread가 `Pipeline::Stop()`을 호출합니다.
-

@@ -168,4 +168,3 @@ with tempfile.TemporaryDirectory() as directory:
 ```
 
 실제 model directory를 오염시키지 않고 file I/O를 검증할 수 있습니다.
-

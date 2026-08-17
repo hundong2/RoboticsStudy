@@ -135,4 +135,3 @@ jobs:
 - job은 독립 runner에서 실행되는 작업 묶음입니다.
 - step은 job 안에서 순서대로 실행됩니다.
 - 로컬 test script와 CI command를 같은 형태로 유지하면 환경 차이를 줄일 수 있습니다.
-
