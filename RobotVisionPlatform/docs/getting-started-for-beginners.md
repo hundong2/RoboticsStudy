@@ -100,3 +100,4 @@ ctest --test-dir device/build --output-on-failure
 6. [ONNX/TensorRT 모델 배포](../device/guides/README.md)
 
 문제가 생기면 [문제 해결 문서](troubleshooting.md)를 먼저 확인합니다.
+코드에서 모르는 함수나 타입은 [Reference 사전](../reference/README.md)에서 이름으로 찾을 수 있습니다.

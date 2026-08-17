@@ -5,6 +5,7 @@
 | [getting-started-for-beginners.md](getting-started-for-beginners.md) | 처음 실행하는 사람을 위한 순서별 실습 |
 | [glossary.md](glossary.md) | 프로젝트에서 사용하는 용어 설명 |
 | [troubleshooting.md](troubleshooting.md) | 자주 발생하는 설치·실행 문제 |
+| [../reference/README.md](../reference/README.md) | 함수·타입·명령 사전과 실제 소스 위치 |
 | [architecture.md](architecture.md) | 전체 구성, 경계, 데이터 흐름 |
 | [initial-release-guide.md](initial-release-guide.md) | v0.1.0 빌드·설치·검증·롤백 |
 | [jetson-deployment.md](jetson-deployment.md) | Orin Nano Super 준비와 서비스 운영 |

@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 def sha256(path: Path) -> str:
+    """Return a streaming SHA-256 digest without loading the whole model into RAM."""
     digest = hashlib.sha256()
     with path.open("rb") as source:
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
@@ -18,6 +19,7 @@ def sha256(path: Path) -> str:
 
 
 def main() -> int:
+    """Validate CLI metadata and write a reproducible model bundle manifest."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--model-id", required=True)
@@ -33,10 +35,12 @@ def main() -> int:
     dimensions = [int(value) for value in args.input_shape.split(",")]
     if len(dimensions) != 4 or any(value <= 0 for value in dimensions):
         parser.error("--input-shape must contain four positive dimensions, e.g. 1,3,640,640")
+    # Empty lines are ignored, while the remaining order is preserved as the class index contract.
     labels = [line.strip() for line in args.labels.read_text(encoding="utf-8").splitlines() if line.strip()]
     if not labels:
         parser.error("labels file is empty")
 
+    # Keep preprocessing and postprocessing beside the artifact hash so runtime settings cannot drift.
     manifest = {
         "schemaVersion": 1,
         "modelId": args.model_id,

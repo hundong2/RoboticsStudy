@@ -11,6 +11,7 @@ from ultralytics import YOLO
 
 
 def main() -> int:
+    """Export a checkpoint and copy the generated ONNX file to a stable bundle path."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--weights", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -20,6 +21,7 @@ def main() -> int:
     parser.add_argument("--simplify", action="store_true")
     args = parser.parse_args()
 
+    # Ultralytics selects the task from checkpoint metadata and returns the generated file path.
     model = YOLO(str(args.weights))
     exported = Path(model.export(
         format="onnx",
@@ -29,6 +31,7 @@ def main() -> int:
         simplify=args.simplify,
     ))
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    # model.export writes beside the checkpoint by default; copy it into our versioned bundle.
     if exported.resolve() != args.output.resolve():
         shutil.copy2(exported, args.output)
     print(f"onnx={args.output}")

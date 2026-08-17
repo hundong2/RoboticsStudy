@@ -18,10 +18,13 @@
   <header><h1>Robot Vision Monitor</h1><div class="muted">MVP device registry · refreshes every 2 seconds</div></header>
   <main id="devices"><div class="card">장치 이벤트를 기다리는 중…</div></main>
   <script>
+    // The MVP dashboard polls snapshots. SignalR will replace polling for live overlays later.
     const root = document.querySelector('#devices');
+    // Escape every value inserted into HTML so device/model labels cannot inject markup.
     const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     async function refresh() {
       try {
+        // Fetch a snapshot array and rebuild the small card list every two seconds.
         const response = await fetch('/api/devices');
         const devices = await response.json();
         root.innerHTML = devices.length ? devices.map(d => `<section class="card">
@@ -29,10 +32,13 @@
           <p>sequence <code>${d.lastSequence}</code> · model <code>${esc(d.modelVersion)}</code></p>
           <ul>${d.detections.map(x => `<li>${esc(x.label)} ${(x.confidence * 100).toFixed(1)}%</li>`).join('') || '<li class="muted">no detections</li>'}</ul>
         </section>`).join('') : '<div class="card">장치 이벤트를 기다리는 중…</div>';
-      } catch { root.innerHTML = '<div class="card">서버 연결 실패</div>'; }
+      } catch {
+        // A visible failure state is more useful than leaving stale device cards on screen.
+        root.innerHTML = '<div class="card">서버 연결 실패</div>';
+      }
     }
+    // Run immediately, then continue periodic polling while this page is open.
     refresh(); setInterval(refresh, 2000);
   </script>
 </body>
 </html>
-

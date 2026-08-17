@@ -11,6 +11,7 @@ from onnx import TensorProto, checker, shape_inference
 
 
 def tensor_shape(value: onnx.ValueInfoProto) -> str:
+    """Convert ONNX dimension metadata to a readable `1x3x640x640` string."""
     tensor_type = value.type.tensor_type
     dimensions: list[str] = []
     for dimension in tensor_type.shape.dim:
@@ -24,24 +25,30 @@ def tensor_shape(value: onnx.ValueInfoProto) -> str:
 
 
 def describe(kind: str, values: list[onnx.ValueInfoProto]) -> None:
+    """Print a compact contract line for each graph input or output."""
     for value in values:
         element_type = TensorProto.DataType.Name(value.type.tensor_type.elem_type)
         print(f"{kind}: name={value.name} shape={tensor_shape(value)} type={element_type}")
 
 
 def main() -> int:
+    """Parse CLI arguments, check the graph, infer shapes, and print metadata."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("model", type=Path)
     parser.add_argument("--save-inferred", type=Path, help="Write a shape-inferred ONNX copy")
     args = parser.parse_args()
 
+    # load_external_data=True also reads large weights stored beside the .onnx file.
     model = onnx.load(args.model, load_external_data=True)
+    # checker catches invalid node links, types, and graph structure before deployment.
     checker.check_model(model)
+    # Shape inference fills output dimensions that can be derived from graph operators.
     inferred = shape_inference.infer_shapes(model)
 
     print(f"model={args.model}")
     print("opsets=" + ",".join(f"{item.domain or 'ai.onnx'}:{item.version}" for item in model.opset_import))
     print(f"nodes={len(model.graph.node)} initializers={len(model.graph.initializer)}")
+    # Initializers are weights/constants and should not be reported as runtime inputs.
     initializer_names = {item.name for item in inferred.graph.initializer}
     describe("input", [item for item in inferred.graph.input if item.name not in initializer_names])
     describe("output", list(inferred.graph.output))

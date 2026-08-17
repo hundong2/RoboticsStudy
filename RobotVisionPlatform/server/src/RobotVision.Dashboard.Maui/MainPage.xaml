@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:RobotVision.Dashboard.Maui"
              x:Class="RobotVision.Dashboard.Maui.MainPage">
+  <!-- BlazorWebView loads local Razor UI while still running inside a native MAUI page. -->
   <BlazorWebView HostPage="wwwroot/index.html">
     <BlazorWebView.RootComponents>
       <RootComponent Selector="#app" ComponentType="{x:Type local:Main}" />
     </BlazorWebView.RootComponents>
   </BlazorWebView>
 </ContentPage>
-

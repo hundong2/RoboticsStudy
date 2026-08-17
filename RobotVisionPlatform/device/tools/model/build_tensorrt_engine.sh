@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+# Build and benchmark a target-specific FP16 TensorRT engine from an ONNX model.
+# Run this on the deployment Jetson so the engine matches its TensorRT/GPU versions.
 set -euo pipefail
 
+# Arguments are kept separate from trtexec options to avoid accidental shell expansion.
 onnx_path=""
 engine_path=""
 input_name=""
@@ -11,9 +14,11 @@ max_shape=""
 trtexec_bin="${TRTEXEC_BIN:-trtexec}"
 
 usage() {
+  # Print the two supported modes: one fixed shape or a dynamic min/opt/max profile.
   echo "Usage: $0 --onnx MODEL --engine ENGINE --input NAME [--shape 1x3x640x640 | --min-shape ... --opt-shape ... --max-shape ...]"
 }
 
+# Parse `--name value` pairs. Unknown options fail instead of being forwarded silently.
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --onnx) onnx_path="$2"; shift 2 ;;
@@ -45,6 +50,7 @@ fi
 mkdir -p "$(dirname "$engine_path")"
 build_shape_args=()
 run_shape_args=()
+# Dynamic profiles are builder options; benchmarking uses the most common opt shape.
 if [[ -n "$fixed_shape" ]]; then
   build_shape_args+=("--shapes=${input_name}:${fixed_shape}")
   run_shape_args+=("--shapes=${input_name}:${fixed_shape}")
@@ -58,6 +64,7 @@ else
   exit 2
 fi
 
+# First pass parses ONNX and serializes the optimized engine without benchmarking.
 "$trtexec_bin" \
   "--onnx=$onnx_path" \
   "--saveEngine=$engine_path" \
@@ -65,6 +72,7 @@ fi
   --skipInference \
   "${build_shape_args[@]}"
 
+# Second pass loads exactly that engine, warms it up, and measures steady-state latency.
 "$trtexec_bin" \
   "--loadEngine=$engine_path" \
   --warmUp=1000 \

@@ -1,9 +1,12 @@
 param(
+    # Base URL of the locally running ASP.NET Core ingest server.
     [string]$ServerUrl = 'http://localhost:5080',
+    # Device ID shown on the monitoring page.
     [string]$DeviceId = 'beginner-demo-001'
 )
 
 $ErrorActionPreference = 'Stop'
+# PowerShell object -> JSON avoids quote escaping mistakes in a handwritten JSON string.
 $body = @{
     deviceId = $DeviceId
     sequence = 1
@@ -13,6 +16,7 @@ $body = @{
     )
 } | ConvertTo-Json -Depth 4
 
+# POST the same camelCase contract used by the C++ HTTP event sink.
 $response = Invoke-WebRequest `
     -Uri "$($ServerUrl.TrimEnd('/'))/api/events/detections" `
     -Method Post `
@@ -20,4 +24,3 @@ $response = Invoke-WebRequest `
     -Body $body
 
 Write-Host "Demo event accepted: HTTP $($response.StatusCode), device=$DeviceId"
-

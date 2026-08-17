@@ -53,6 +53,7 @@ RobotVisionPlatform/
 ├── device/              # Jetson에서 실행되는 C++20 프로젝트
 ├── server/              # ASP.NET Core 수집 서버와 MAUI 관제 앱
 ├── shared/proto/        # 장치/서버 공용 protobuf 계약
+├── reference/           # 함수·타입·명령을 이름으로 찾는 개발 사전
 ├── deploy/              # Compose, systemd, 배포 설정
 ├── scripts/             # 개발·검증 스크립트
 └── ../.github/workflows/ # GitHub가 인식하는 저장소 루트 CI/릴리스 자동화
@@ -128,6 +129,7 @@ dotnet run --project server/src/RobotVision.Server.Api
 - [용어집](docs/glossary.md)
 - [문제 해결](docs/troubleshooting.md)
 - [ONNX/TensorRT 모델 배포 가이드](device/guides/README.md)
+- [함수·타입·명령 Reference 사전](reference/README.md)
 
 ## 기술 기준
 

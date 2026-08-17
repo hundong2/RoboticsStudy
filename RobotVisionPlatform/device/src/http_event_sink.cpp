@@ -17,6 +17,8 @@ namespace net = boost::asio;
 using tcp = net::ip::tcp;
 
 std::string Escape(std::string_view value) {
+  // 이 MVP JSON writer가 사용하는 문자열 필드에서 최소한의 quote/backslash escaping을 합니다.
+  // production에서는 검증된 JSON serializer를 사용해 control character까지 처리해야 합니다.
   std::string result;
   for (char ch : value) {
     if (ch == '"' || ch == '\\') result.push_back('\\');
@@ -32,12 +34,14 @@ class HttpEventSink final : public IEventSink {
 
   bool Publish(const DetectionEvent& event) override {
     try {
+      // MVP는 호출마다 연결합니다. production 구현은 keep-alive/HTTP2/gRPC를 재사용합니다.
       net::io_context context;
       tcp::resolver resolver(context);
       beast::tcp_stream stream(context);
       stream.expires_after(std::chrono::seconds(3));
       stream.connect(resolver.resolve(host_, port_));
 
+      // DetectionEvent를 서버의 DetectionEventDto camelCase JSON 계약으로 변환합니다.
       std::ostringstream body;
       body << "{\"deviceId\":\"" << Escape(event.device_id) << "\",\"sequence\":"
            << event.sequence << ",\"modelVersion\":\"" << Escape(event.model_version)
@@ -63,6 +67,7 @@ class HttpEventSink final : public IEventSink {
       http::read(stream, buffer, response);
       beast::error_code ignored;
       stream.socket().shutdown(tcp::socket::shutdown_both, ignored);
+      // 2xx만 성공으로 계산하여 pipeline의 published counter 의미를 일관되게 유지합니다.
       return response.result_int() >= 200 && response.result_int() < 300;
     } catch (...) {
       return false;  // Production adapter adds bounded disk spool + retry/backoff.
@@ -78,7 +83,7 @@ class HttpEventSink final : public IEventSink {
 
 std::unique_ptr<IEventSink> MakeHttpEventSink(std::string host, std::string port,
                                               std::string target) {
+  // unique_ptr로 반환해 sink 수명과 정리를 Pipeline 한 곳에서 관리합니다.
   return std::make_unique<HttpEventSink>(std::move(host), std::move(port), std::move(target));
 }
 }  // namespace rv
-

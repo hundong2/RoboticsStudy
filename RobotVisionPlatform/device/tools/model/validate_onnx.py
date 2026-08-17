@@ -12,6 +12,7 @@ import onnxruntime as ort
 
 
 def parse_shapes(items: list[str]) -> dict[str, tuple[int, ...]]:
+    """Parse repeated `name=1,3,640,640` CLI values into concrete dimensions."""
     result: dict[str, tuple[int, ...]] = {}
     for item in items:
         try:
@@ -26,6 +27,7 @@ def parse_shapes(items: list[str]) -> dict[str, tuple[int, ...]]:
 
 
 def providers_for(name: str) -> list[str | tuple[str, dict[str, object]]]:
+    """Return ONNX Runtime providers in preferred-to-fallback priority order."""
     if name == "cpu":
         return ["CPUExecutionProvider"]
     if name == "cuda":
@@ -38,6 +40,7 @@ def providers_for(name: str) -> list[str | tuple[str, dict[str, object]]]:
 
 
 def concrete_shape(name: str, model_shape: list[int | str | None], overrides: dict[str, tuple[int, ...]]) -> tuple[int, ...]:
+    """Resolve a static model shape or require a CLI override for dynamic inputs."""
     if name in overrides:
         return overrides[name]
     if any(not isinstance(value, int) or value <= 0 for value in model_shape):
@@ -46,6 +49,7 @@ def concrete_shape(name: str, model_shape: list[int | str | None], overrides: di
 
 
 def numpy_type(ort_type: str) -> np.dtype:
+    """Map common ONNX Runtime tensor type names to NumPy dtypes."""
     supported = {
         "tensor(float)": np.dtype(np.float32),
         "tensor(float16)": np.dtype(np.float16),
@@ -58,6 +62,7 @@ def numpy_type(ort_type: str) -> np.dtype:
 
 
 def main() -> int:
+    """Create an inference session, build inputs, warm up, and benchmark outputs."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("model", type=Path)
     parser.add_argument("--provider", choices=("cpu", "cuda", "tensorrt"), default="cpu")
@@ -69,6 +74,7 @@ def main() -> int:
     if args.runs < 1:
         parser.error("--runs must be at least 1")
 
+    # ONNX Runtime can silently fall back; fail early so GPU tests are not mistaken for CPU tests.
     required_provider = {
         "cpu": "CPUExecutionProvider",
         "cuda": "CUDAExecutionProvider",
@@ -90,6 +96,7 @@ def main() -> int:
     feeds: dict[str, np.ndarray] = {}
     for index, item in enumerate(session.get_inputs()):
         if args.input_npy and len(session.get_inputs()) == 1:
+            # A saved preprocessed tensor gives more meaningful parity than random input.
             value = np.load(args.input_npy)
         else:
             shape = concrete_shape(item.name, item.shape, overrides)
@@ -98,6 +105,7 @@ def main() -> int:
         feeds[item.name] = value
         print(f"input[{index}] name={item.name} shape={value.shape} dtype={value.dtype}")
 
+    # Exclude one-time graph/session initialization effects from the measured runs.
     session.run(None, feeds)  # warm-up
     started = time.perf_counter()
     outputs: list[np.ndarray] = []
@@ -107,6 +115,7 @@ def main() -> int:
 
     for index, value in enumerate(outputs):
         numeric = np.asarray(value)
+        # Ignore NaN/Inf when calculating readable output statistics.
         finite = numeric[np.isfinite(numeric)] if np.issubdtype(numeric.dtype, np.number) else np.array([])
         stats = "non-numeric-or-empty"
         if finite.size:
