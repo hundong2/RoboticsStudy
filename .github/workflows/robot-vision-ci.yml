@@ -20,6 +20,8 @@ jobs:
         run: cmake --build device/build --parallel
       - name: Test
         run: ctest --test-dir device/build --output-on-failure
+      - name: Test model tooling
+        run: python3 -m unittest discover -s device/tools/model/tests -v
 
   server:
     runs-on: ubuntu-24.04
@@ -33,4 +35,3 @@ jobs:
           dotnet-version: "10.0.x"
       - run: dotnet build server/RobotVision.Server.slnx --configuration Release
       - run: dotnet run --project server/tests/RobotVision.Server.Tests --configuration Release
-

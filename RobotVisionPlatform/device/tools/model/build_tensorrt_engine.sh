@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+onnx_path=""
+engine_path=""
+input_name=""
+fixed_shape=""
+min_shape=""
+opt_shape=""
+max_shape=""
+trtexec_bin="${TRTEXEC_BIN:-trtexec}"
+
+usage() {
+  echo "Usage: $0 --onnx MODEL --engine ENGINE --input NAME [--shape 1x3x640x640 | --min-shape ... --opt-shape ... --max-shape ...]"
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --onnx) onnx_path="$2"; shift 2 ;;
+    --engine) engine_path="$2"; shift 2 ;;
+    --input) input_name="$2"; shift 2 ;;
+    --shape) fixed_shape="$2"; shift 2 ;;
+    --min-shape) min_shape="$2"; shift 2 ;;
+    --opt-shape) opt_shape="$2"; shift 2 ;;
+    --max-shape) max_shape="$2"; shift 2 ;;
+    --trtexec) trtexec_bin="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown argument: $1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+if [[ -z "$onnx_path" || -z "$engine_path" || -z "$input_name" ]]; then
+  usage >&2
+  exit 2
+fi
+if [[ ! -f "$onnx_path" ]]; then
+  echo "ONNX model not found: $onnx_path" >&2
+  exit 2
+fi
+if ! command -v "$trtexec_bin" >/dev/null 2>&1; then
+  echo "trtexec not found. Set TRTEXEC_BIN or pass --trtexec /usr/src/tensorrt/bin/trtexec" >&2
+  exit 2
+fi
+
+mkdir -p "$(dirname "$engine_path")"
+build_shape_args=()
+run_shape_args=()
+if [[ -n "$fixed_shape" ]]; then
+  build_shape_args+=("--shapes=${input_name}:${fixed_shape}")
+  run_shape_args+=("--shapes=${input_name}:${fixed_shape}")
+elif [[ -n "$min_shape" && -n "$opt_shape" && -n "$max_shape" ]]; then
+  build_shape_args+=("--minShapes=${input_name}:${min_shape}")
+  build_shape_args+=("--optShapes=${input_name}:${opt_shape}")
+  build_shape_args+=("--maxShapes=${input_name}:${max_shape}")
+  run_shape_args+=("--shapes=${input_name}:${opt_shape}")
+else
+  echo "Provide --shape or all of --min-shape, --opt-shape, --max-shape" >&2
+  exit 2
+fi
+
+"$trtexec_bin" \
+  "--onnx=$onnx_path" \
+  "--saveEngine=$engine_path" \
+  --fp16 \
+  --skipInference \
+  "${build_shape_args[@]}"
+
+"$trtexec_bin" \
+  "--loadEngine=$engine_path" \
+  --warmUp=1000 \
+  --duration=10 \
+  "${run_shape_args[@]}"
+
+echo "TensorRT engine ready: $engine_path"

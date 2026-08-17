@@ -97,6 +97,6 @@ ctest --test-dir device/build --output-on-failure
 3. [Fine-tuning 실습 순서](../tips/training/fine-tuning-playbook.md)
 4. [전체 아키텍처](architecture.md)
 5. [Jetson 배포](jetson-deployment.md)
+6. [ONNX/TensorRT 모델 배포](../device/guides/README.md)
 
 문제가 생기면 [문제 해결 문서](troubleshooting.md)를 먼저 확인합니다.
-

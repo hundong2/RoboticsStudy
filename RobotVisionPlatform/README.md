@@ -127,6 +127,7 @@ dotnet run --project server/src/RobotVision.Server.Api
 - [초보자 시작 가이드](docs/getting-started-for-beginners.md)
 - [용어집](docs/glossary.md)
 - [문제 해결](docs/troubleshooting.md)
+- [ONNX/TensorRT 모델 배포 가이드](device/guides/README.md)
 
 ## 기술 기준
 
