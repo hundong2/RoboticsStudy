@@ -29,4 +29,3 @@ PyTorch/학습 도구
 | TensorRT가 지원하지 않는 일부 ONNX 연산 | ONNX Runtime TensorRT EP | 지원 node는 TensorRT, 나머지는 CUDA/CPU fallback 가능 |
 
 TensorRT와 DeepStream 중 하나가 항상 정답은 아닙니다. 첫 모델은 두 방식의 정확도, FPS, 지연, 메모리를 실제 Jetson에서 비교한 후 선택합니다.
-

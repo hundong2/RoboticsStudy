@@ -60,4 +60,3 @@ FP16을 먼저 정확도 기준선으로 만듭니다. INT8은 실제 운영 장
 - 속도가 느림: CPU fallback, 입력 복사, power mode, thermal throttling을 함께 확인
 
 공식 자료: [TensorRT ONNX deployment quick start](https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/quick-start-onnx-deployment.html), [TensorRT dynamic shapes](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/work-with-dynamic-shapes.html)
-

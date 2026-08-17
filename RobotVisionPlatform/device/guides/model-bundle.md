@@ -28,4 +28,3 @@ person-detector/0.1.0/
 6. health guardrail 위반 시 이전 symlink로 rollback합니다.
 
 engine은 Git에 commit하지 않습니다. ONNX도 크기가 크면 Git LFS나 모델 registry/object storage에서 관리하고 저장소에는 manifest만 둡니다.
-

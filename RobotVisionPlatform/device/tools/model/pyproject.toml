@@ -14,4 +14,3 @@ export = ["ultralytics>=8.3"]
 
 [tool.uv]
 package = false
-

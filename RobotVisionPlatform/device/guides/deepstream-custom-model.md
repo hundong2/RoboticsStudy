@@ -31,4 +31,3 @@ network-mode=2
 여러 문제를 한 번에 연결하면 모델 문제와 영상 pipeline 문제를 구분하기 어렵습니다.
 
 공식 자료: [DeepStream custom model guide](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_using_custom_model.html)
-
