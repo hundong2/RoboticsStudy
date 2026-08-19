@@ -52,26 +52,30 @@ void Pipeline::CaptureLoop(std::stop_token stop) {
       if (!frames_.Push(std::move(frame))) break;
     }
   } catch (const std::exception& error) {
-    std::cerr << "capture_error=\"" << error.what() << "\"\n";
+    std::cerr << "capture_error: " << error.what() << "\n";
   }
   frames_.Close();
 }
 
 void Pipeline::InferenceLoop(std::stop_token stop) {
-  while (!stop.stop_requested()) {
-    // Pop은 새 프레임, queue close, stop 요청 중 하나가 발생할 때 깨어납니다.
-    auto frame = frames_.Pop(stop);
-    if (!frame) break;
-    auto detections = detector_->Infer(*frame);
-    ++inferred_;
-    // model version과 원본 sequence를 함께 보내 서버가 결과의 출처를 추적하게 합니다.
-    DetectionEvent event{.device_id = options_.device_id,
-                         .sequence = frame->sequence,
-                         .captured_at = frame->captured_at,
-                         .model_version = detector_->Version(),
-                         .detections = std::move(detections)};
-    // false는 전송 실패를 의미합니다. production sink는 자체 retry/spool 정책을 가져야 합니다.
-    if (sink_->Publish(event)) ++published_;
+  try {
+    while (!stop.stop_requested()) {
+      // Pop은 새 프레임, queue close, stop 요청 중 하나가 발생할 때 깨어납니다.
+      auto frame = frames_.Pop(stop);
+      if (!frame) break;
+      auto detections = detector_->Infer(*frame);
+      ++inferred_;
+      // model version과 원본 sequence를 함께 보내 서버가 결과의 출처를 추적하게 합니다.
+      DetectionEvent event{.device_id = options_.device_id,
+                           .sequence = frame->sequence,
+                           .captured_at = frame->captured_at,
+                           .model_version = detector_->Version(),
+                           .detections = std::move(detections)};
+      // false는 전송 실패를 의미합니다. production sink는 자체 retry/spool 정책을 가져야 합니다.
+      if (sink_->Publish(event)) ++published_;
+    }
+  } catch (const std::exception& error) {
+    std::cerr << "inference_error: " << error.what() << "\n";
   }
 }
 

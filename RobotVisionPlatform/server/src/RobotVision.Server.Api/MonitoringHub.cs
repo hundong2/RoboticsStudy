@@ -14,5 +14,11 @@ public sealed class MonitoringHub : Hub
         Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName(deviceId));
 
     /// <summary>장치 ID를 서버 전체에서 일관된 group 이름으로 변환합니다.</summary>
-    public static string GroupName(string deviceId) => $"device:{deviceId}";
+    /// <exception cref="ArgumentException">deviceId가 비어 있거나 64자를 초과하면 발생합니다.</exception>
+    public static string GroupName(string deviceId)
+    {
+        if (string.IsNullOrWhiteSpace(deviceId) || deviceId.Length > 64)
+            throw new ArgumentException("deviceId must be 1–64 non-whitespace characters.", nameof(deviceId));
+        return $"device:{deviceId}";
+    }
 }

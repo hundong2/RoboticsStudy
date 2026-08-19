@@ -10,5 +10,6 @@ device/stage/
 .venv/
 __pycache__/
 secrets/
-models/*.engine
+**/*.engine
+**/*.plan
 device/artifacts/

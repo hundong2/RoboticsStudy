@@ -17,12 +17,20 @@ namespace net = boost::asio;
 using tcp = net::ip::tcp;
 
 std::string Escape(std::string_view value) {
-  // 이 MVP JSON writer가 사용하는 문자열 필드에서 최소한의 quote/backslash escaping을 합니다.
-  // production에서는 검증된 JSON serializer를 사용해 control character까지 처리해야 합니다.
+  // 이 MVP JSON writer가 사용하는 문자열 필드에서 최소한의 escaping을 합니다.
+  // production에서는 검증된 JSON serializer를 사용해야 합니다.
   std::string result;
-  for (char ch : value) {
-    if (ch == '"' || ch == '\\') result.push_back('\\');
-    result.push_back(ch);
+  for (unsigned char ch : value) {
+    switch (ch) {
+      case '"':  result += "\\\""; break;
+      case '\\': result += "\\\\"; break;
+      case '\n': result += "\\n";  break;
+      case '\r': result += "\\r";  break;
+      case '\t': result += "\\t";  break;
+      default:
+        if (ch < 0x20) continue;  // drop other control characters
+        result.push_back(static_cast<char>(ch));
+    }
   }
   return result;
 }

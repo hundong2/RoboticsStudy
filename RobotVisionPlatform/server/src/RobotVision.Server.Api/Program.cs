@@ -39,7 +39,7 @@ app.MapPost("/api/events/detections", async (
     CancellationToken cancellationToken) =>
 {
     // 잘못된 ID와 비정상적으로 큰 payload를 background queue에 넣기 전에 거부합니다.
-    if (string.IsNullOrWhiteSpace(item.DeviceId) || item.Detections.Count > 1_000)
+    if (string.IsNullOrWhiteSpace(item.DeviceId) || item.Detections is null || item.Detections.Count > 1_000)
         return Results.BadRequest(new { error = "deviceId is required; max 1000 detections" });
 
     // 조회용 최신 상태를 먼저 갱신하고, 실시간 UI fan-out은 bounded channel에 위임합니다.
