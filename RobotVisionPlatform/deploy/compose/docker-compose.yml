@@ -1,0 +1,10 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: server/src/RobotVision.Server.Api/Dockerfile
+    ports:
+      - "5080:5080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    restart: unless-stopped

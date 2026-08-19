@@ -1,0 +1,25 @@
+name: robot-vision-release-device
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["robot-vision-v*"]
+
+jobs:
+  jetson-arm64:
+    # Native Jetson build avoids shipping an incompatible TensorRT engine/runtime.
+    runs-on: [self-hosted, linux, arm64, jetson]
+    defaults:
+      run:
+        working-directory: RobotVisionPlatform
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S device -B device/build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build device/build --parallel
+      - run: ctest --test-dir device/build --output-on-failure
+      - run: cmake --install device/build --prefix device/stage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: robot-vision-device-linux-arm64
+          path: RobotVisionPlatform/device/stage
+

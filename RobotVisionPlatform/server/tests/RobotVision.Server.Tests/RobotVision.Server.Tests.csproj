@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/RobotVision.Server.Api/RobotVision.Server.Api.csproj" />
+    <ProjectReference Include="../../src/RobotVision.Server.Contracts/RobotVision.Server.Contracts.csproj" />
+  </ItemGroup>
+</Project>
+

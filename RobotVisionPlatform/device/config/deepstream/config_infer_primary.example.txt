@@ -1,0 +1,26 @@
+# Copy this file into a model version directory and replace every path/value.
+[property]
+gpu-id=0
+onnx-file=/opt/robot-vision/models/example-detector/0.1.0/model.onnx
+model-engine-file=/opt/robot-vision/models/example-detector/0.1.0/model.fp16.engine
+labelfile-path=/opt/robot-vision/models/example-detector/0.1.0/labels.txt
+batch-size=1
+network-mode=2
+network-type=0
+num-detected-classes=2
+gie-unique-id=1
+interval=0
+model-color-format=0
+net-scale-factor=0.00392156862745098
+maintain-aspect-ratio=1
+symmetric-padding=1
+cluster-mode=2
+
+# Most detectors require a model-specific output parser. Uncomment after building it.
+# custom-lib-path=/opt/robot-vision/lib/libnvdsinfer_custom_robotvision.so
+# parse-bbox-func-name=NvDsInferParseRobotVision
+
+[class-attrs-all]
+pre-cluster-threshold=0.50
+nms-iou-threshold=0.45
+topk=300

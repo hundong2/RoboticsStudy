@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/RobotVision.Server.Contracts/RobotVision.Server.Contracts.csproj" />
+  <Project Path="src/RobotVision.Server.Api/RobotVision.Server.Api.csproj" />
+  <Project Path="tests/RobotVision.Server.Tests/RobotVision.Server.Tests.csproj" />
+</Solution>
+

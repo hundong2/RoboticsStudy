@@ -1,0 +1,37 @@
+name: robot-vision-ci
+
+on:
+  push:
+    paths: ["RobotVisionPlatform/**", ".github/workflows/robot-vision-*.yml"]
+  pull_request:
+    paths: ["RobotVisionPlatform/**", ".github/workflows/robot-vision-*.yml"]
+
+jobs:
+  device:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: RobotVisionPlatform
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S device -B device/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DRV_ENABLE_BOOST_HTTP=OFF
+      - name: Build
+        run: cmake --build device/build --parallel
+      - name: Test
+        run: ctest --test-dir device/build --output-on-failure
+      - name: Test model tooling
+        run: python3 -m unittest discover -s device/tools/model/tests -v
+
+  server:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: RobotVisionPlatform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - run: dotnet build server/RobotVision.Server.slnx --configuration Release
+      - run: dotnet run --project server/tests/RobotVision.Server.Tests --configuration Release

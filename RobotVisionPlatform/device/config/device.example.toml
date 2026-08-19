@@ -1,0 +1,30 @@
+[device]
+id = "jetson-dev-001"
+site = "lab-a"
+
+[camera]
+kind = "synthetic" # synthetic | v4l2 | nvargus
+uri = "/dev/video0"
+width = 1280
+height = 720
+fps = 30
+
+[inference]
+backend = "demo" # demo | tensorrt | deepstream
+model_manifest = "/opt/robot-vision/models/current/manifest.json"
+confidence = 0.50
+queue_capacity = 2
+
+[server]
+control_uri = "https://vision.example.internal:7443"
+webrtc_signaling_uri = "wss://vision.example.internal/webrtc"
+ca_certificate = "/etc/robot-vision/pki/ca.pem"
+client_certificate = "/etc/robot-vision/pki/device.pem"
+client_key = "/etc/robot-vision/pki/device-key.pem"
+
+[video]
+enabled = false
+codec = "h264"
+bitrate_kbps = 2500
+keyframe_interval = 30
+

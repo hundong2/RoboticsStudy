@@ -1,0 +1,15 @@
+device/build*/
+device/stage/
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.log
+.env
+.venv/
+__pycache__/
+secrets/
+**/*.engine
+**/*.plan
+device/artifacts/

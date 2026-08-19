@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package robotvision.vision.v1;
+option csharp_namespace = "RobotVision.Contracts.Grpc.V1";
+
+import "google/protobuf/timestamp.proto";
+
+// DeviceControl keeps one long-lived, device-initiated control-plane connection.
+service DeviceControl {
+  // The device sends status/events while the server returns commands on the same stream.
+  rpc Connect(stream DeviceEnvelope) returns (stream ServerCommand);
+}
+
+// DeviceEnvelope wraps every device-to-server payload with ordering and identity fields.
+message DeviceEnvelope {
+  // Stable fleet identifier provisioned with the device certificate.
+  string device_id = 1;
+  // Monotonically increasing per-device number used for duplicate/order handling.
+  uint64 sequence = 2;
+  // UTC time when this envelope left the device process.
+  google.protobuf.Timestamp sent_at = 3;
+  // Exactly one payload is present. New payload types can be added with new field numbers.
+  oneof payload {
+    Heartbeat heartbeat = 10;
+    DetectionBatch detections = 11;
+    ModelState model_state = 12;
+  }
+}
+
+// Heartbeat is a lightweight periodic health and performance report.
+message Heartbeat {
+  double capture_fps = 1;
+  double inference_fps = 2;
+  double temperature_c = 3;
+  uint64 dropped_frames = 4;
+  string software_version = 5;
+}
+
+// DetectionBatch contains all objects detected in one captured frame.
+message DetectionBatch {
+  // Camera capture time; different from the later envelope sent_at time.
+  google.protobuf.Timestamp captured_at = 1;
+  string model_version = 2;
+  repeated Detection items = 3;
+}
+
+// Detection uses normalized top-left x/y and width/height coordinates in the 0..1 range.
+message Detection {
+  string label = 1;
+  float confidence = 2;
+  float x = 3;
+  float y = 4;
+  float width = 5;
+  float height = 6;
+  // Stable ID assigned by a tracker; zero means no tracking ID is available.
+  uint64 track_id = 7;
+}
+
+// ModelState reports which signed artifact is staged, active, or failed on the device.
+message ModelState {
+  string model_id = 1;
+  string version = 2;
+  string sha256 = 3;
+  string status = 4;
+}
+
+// ServerCommand wraps one expiring, auditable server-to-device request.
+message ServerCommand {
+  // Unique idempotency key; a reconnecting device must not execute it twice.
+  string command_id = 1;
+  // The device rejects commands received after this UTC time.
+  google.protobuf.Timestamp expires_at = 2;
+  oneof payload {
+    UpdateConfiguration update_configuration = 10;
+    DeployModel deploy_model = 11;
+    RequestKeyframe request_keyframe = 12;
+  }
+}
+
+// RFC 7396-style JSON merge patch for fields allowed by the device policy.
+message UpdateConfiguration { string json_merge_patch = 1; }
+
+// DeployModel points to a signed manifest rather than an unverified raw model URL.
+message DeployModel {
+  string manifest_uri = 1;
+  string manifest_sha256 = 2;
+  string signature = 3;
+}
+
+// RequestKeyframe asks for a diagnostic image without enabling continuous upload.
+message RequestKeyframe { string reason = 1; }
