@@ -291,7 +291,9 @@ def table_widths(headers):
             return [1600, 7760]
         return [2700, 6660]
     if n == 4 and headers[0] in {"핀", "Pin"}:
-        return [900, 3780, 900, 3780]
+        return [900, 3500, 2200, 2760]
+    if n == 5 and headers[0] in {"핀", "Pin"}:
+        return [750, 2050, 1100, 2650, 2810]
     if n == 5:
         return [1500, 2100, 2300, 900, 2560]
     base = TOTAL_DXA // n

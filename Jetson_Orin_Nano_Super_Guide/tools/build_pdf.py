@@ -157,7 +157,9 @@ def widths_for(headers, max_width):
     if n == 2:
         return [max_width * 0.24, max_width * 0.76]
     if n == 4 and headers[0].lower() in {"핀", "pin"}:
-        return [max_width * 0.10, max_width * 0.40, max_width * 0.10, max_width * 0.40]
+        return [max_width * 0.10, max_width * 0.40, max_width * 0.25, max_width * 0.25]
+    if n == 5 and headers[0].lower() in {"핀", "pin"}:
+        return [max_width * 0.08, max_width * 0.22, max_width * 0.12, max_width * 0.30, max_width * 0.28]
     if n == 5:
         return [max_width * 0.16, max_width * 0.22, max_width * 0.24, max_width * 0.11, max_width * 0.27]
     return [max_width / n] * n
