@@ -15,6 +15,8 @@
 9. `docs/09_운영_안전_문제해결.md`
 10. `references/공식문서_목록.md`와 `references/커버리지_매트릭스.md`
 
+핀 설명에 등장하는 저속 인터페이스의 기초 이론, 배선, Linux 장치 탐색, C/C++ 실습은 `interfaces_practice/README.md`에서 시작합니다. I2C·UART·SPI·GPIO·PWM·CAN·I2S를 다루며 예제는 `interfaces_practice/src/`에 있습니다.
+
 통합본은 `output/Jetson_Orin_Nano_Super_Vision_VLA_가이드북.docx`와 PDF로 제공됩니다.
 
 캐리어보드 사양서 v1.3의 장·표별 한국어 번역·해설은 다음 파일로 제공합니다.
@@ -39,5 +41,6 @@
 
 - Jetson Orin Nano 8GB는 학습용 대형 VLA 전체를 처음부터 훈련하는 장비가 아닙니다. 주 학습은 x86_64 GPU 서버에서 하고 Jetson에서는 양자화된 추론·센서 처리·안전 제어를 수행하는 구성이 현실적입니다.
 - 핫플러그가 명시되지 않은 CSI·GPIO·UART·I2C 장치는 반드시 전원을 끈 뒤 연결하십시오.
+- J12 물리 핀 번호를 Linux GPIO line offset이나 `/dev` 장치 번호로 사용하지 마십시오. 현재 pinmux와 장치 열거 결과를 먼저 확인하십시오.
 - `rm -rf`, 디스크 플래시, 파티션 변경, Secure Boot 퓨즈 작업은 대상 장치 확인 없이 실행하지 마십시오.
 

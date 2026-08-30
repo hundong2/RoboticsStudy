@@ -25,6 +25,26 @@ required_files = [
     ROOT / "translations" / "Jetson_Orin_Nano_DevKit_Carrier_Board_Spec_v1.3_KO.md",
     ROOT / "output" / "Jetson_Orin_Nano_Carrier_Board_Spec_v1.3_KO.docx",
     ROOT / "output" / "Jetson_Orin_Nano_Carrier_Board_Spec_v1.3_KO.pdf",
+    ROOT / "interfaces_practice" / "README.md",
+    ROOT / "interfaces_practice" / "CMakeLists.txt",
+    *(ROOT / "interfaces_practice" / "docs" / f for f in [
+        "00_공통_기초와_안전.md",
+        "01_I2C.md",
+        "02_UART.md",
+        "03_SPI.md",
+        "04_GPIO_PWM.md",
+        "05_CAN.md",
+        "06_I2S와_기타.md",
+        "07_문제해결.md",
+    ]),
+    *(ROOT / "interfaces_practice" / "src" / f for f in [
+        "i2c_read.cpp",
+        "uart_loopback.c",
+        "spi_loopback.c",
+        "gpio_v2_toggle.c",
+        "can_socketcan.cpp",
+        "pwm_sysfs.cpp",
+    ]),
 ]
 
 errors = []
@@ -78,10 +98,28 @@ for pin in range(1, 41):
     if not re.search(rf"\|\s*{pin}\s*\|", translation):
         errors.append(f"translated J12 pin {pin} not found")
 
+practice_text = "\n".join(
+    path.read_text(encoding="utf-8")
+    for path in (ROOT / "interfaces_practice").rglob("*")
+    if path.suffix in {".md", ".c", ".cpp"}
+)
+for token in (
+    "I2C_RDWR",
+    "termios",
+    "SPI_IOC_MESSAGE",
+    "GPIO_V2_GET_LINE_IOCTL",
+    "SocketCAN",
+    "/sys/class/pwm",
+    "I2S0_SCLK",
+    "3.3V",
+):
+    if token not in practice_text:
+        errors.append(f"interface practice token missing: {token}")
+
 if errors:
     print("VALIDATION FAILED")
     print("\n".join(errors))
     sys.exit(1)
 
-print(f"VALIDATION OK: {len(required_files)} required files; original and translated J12 pins 1-40 covered")
+print(f"VALIDATION OK: {len(required_files)} required files; J12 pins 1-40 and interface practice coverage verified")
 
