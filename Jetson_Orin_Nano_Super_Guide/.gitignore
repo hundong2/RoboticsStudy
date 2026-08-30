@@ -1,0 +1,4 @@
+tmp/
+interfaces_practice/build/
+__pycache__/
+*.pyc
