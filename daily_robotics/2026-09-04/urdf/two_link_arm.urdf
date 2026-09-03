@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot name="two_link_planar_arm">
+  <!-- base_link는 모든 목표점과 TF의 기준이 되는 고정 베이스 좌표계다. -->
+  <link name="base_link">
+    <visual>
+      <geometry><cylinder radius="0.08" length="0.10"/></geometry>
+      <material name="base_blue"><color rgba="0.15 0.30 0.80 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- shoulder_joint의 q1은 base_link의 z축 주위 회전이다. -->
+  <joint name="shoulder_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.10" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14159" upper="3.14159" effort="20" velocity="2"/>
+  </joint>
+
+  <!-- 링크 좌표계는 관절에 두고, 시각 형상만 +x 방향 절반 길이만큼 옮긴다. -->
+  <link name="link_1">
+    <visual>
+      <origin xyz="0.25 0 0" rpy="0 1.57079632679 0"/>
+      <geometry><cylinder radius="0.025" length="0.50"/></geometry>
+      <material name="link_orange"><color rgba="0.95 0.45 0.10 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- elbow_joint는 첫 링크 끝 x=0.5 m에 있으며 q2만큼 z축 회전한다. -->
+  <joint name="elbow_joint" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0.50 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14159" upper="3.14159" effort="15" velocity="2"/>
+  </joint>
+
+  <link name="link_2">
+    <visual>
+      <origin xyz="0.20 0 0" rpy="0 1.57079632679 0"/>
+      <geometry><cylinder radius="0.020" length="0.40"/></geometry>
+      <material name="link_green"><color rgba="0.10 0.75 0.35 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- tool0는 두 번째 링크 끝을 나타내며 움직이지 않는 fixed joint로 연결한다. -->
+  <joint name="tool_joint" type="fixed">
+    <parent link="link_2"/>
+    <child link="tool0"/>
+    <origin xyz="0.40 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="tool0">
+    <visual>
+      <geometry><sphere radius="0.04"/></geometry>
+      <material name="tool_red"><color rgba="0.90 0.10 0.10 1.0"/></material>
+    </visual>
+  </link>
+</robot>
