@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ROS 2 Action · RT 제어 · 2D Scan Matching",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "action-control",
+        "label": "Action 제어 경로",
+        "focus": ["mission-client", "drive-server", "rt-loop", "base-plant"],
+        "note": "Goal·Feedback·Result와 실시간 속도 명령의 경계를 따라갑니다."
+      },
+      {
+        "id": "localization",
+        "label": "Scan matching 경로",
+        "focus": ["lidar-sim", "scan-matcher", "pose-output"],
+        "note": "연속 LaserScan이 ICP 상대 자세 추정으로 바뀌는 흐름입니다."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "mission-client",
+      "type": "external",
+      "label": "Mission Client",
+      "sublabel": "DriveDistance ActionClient",
+      "pos": [40, 130],
+      "size": [160, 70]
+    },
+    {
+      "id": "drive-server",
+      "type": "backend",
+      "label": "Drive Action Server",
+      "sublabel": "Goal · Cancel · Feedback",
+      "pos": [285, 130],
+      "size": [180, 70]
+    },
+    {
+      "id": "rt-loop",
+      "type": "backend",
+      "label": "RT Control Loop",
+      "sublabel": "SCHED_FIFO 시도 · 100 Hz",
+      "tag": "bounded allocation",
+      "pos": [550, 130],
+      "size": [190, 70]
+    },
+    {
+      "id": "base-plant",
+      "type": "external",
+      "label": "Mobile Base",
+      "sublabel": "/cmd_vel · /wheel/odom",
+      "pos": [825, 130],
+      "size": [175, 70]
+    },
+    {
+      "id": "lidar-sim",
+      "type": "external",
+      "label": "Lidar Scan Source",
+      "sublabel": "/scan · sensor_msgs/LaserScan",
+      "pos": [285, 350],
+      "size": [180, 70]
+    },
+    {
+      "id": "scan-matcher",
+      "type": "backend",
+      "label": "2D ICP Scan Matcher",
+      "sublabel": "최근접점 · SVD-free SE(2)",
+      "tag": "fixed iterations",
+      "pos": [550, 350],
+      "size": [190, 70]
+    },
+    {
+      "id": "pose-output",
+      "type": "messagebus",
+      "label": "Relative Pose",
+      "sublabel": "/scan_match/pose · Pose2D",
+      "pos": [825, 350],
+      "size": [175, 70]
+    }
+  ],
+  "connections": [
+    {
+      "id": "action-goal-result",
+      "from": "mission-client",
+      "to": "drive-server",
+      "label": "goal / feedback / result",
+      "variant": "emphasis",
+      "labelDy": 59
+    },
+    {
+      "id": "handoff-command",
+      "from": "drive-server",
+      "to": "rt-loop",
+      "label": "atomic target handoff",
+      "variant": "security",
+      "labelDy": -29
+    },
+    {
+      "id": "velocity-command",
+      "from": "rt-loop",
+      "to": "base-plant",
+      "label": "Twist @ 100 Hz",
+      "variant": "emphasis"
+    },
+    {
+      "id": "laser-scan",
+      "from": "lidar-sim",
+      "to": "scan-matcher",
+      "label": "best-effort LaserScan",
+      "labelDy": 59
+    },
+    {
+      "id": "matched-pose",
+      "from": "scan-matcher",
+      "to": "pose-output",
+      "label": "SE(2) pose estimate",
+      "labelDy": -29
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "ROS 2 Action",
+      "items": ["장기 작업을 Goal·Feedback·Result로 모델링", "Cancel을 안전한 정지 명령으로 연결"]
+    },
+    {
+      "dot": "rose",
+      "title": "실시간 경계",
+      "items": ["비 RT Action 콜백과 100 Hz 제어 루프 분리", "PREEMPT_RT 권한이 없으면 명시적으로 폴백"]
+    },
+    {
+      "dot": "emerald",
+      "title": "2D ICP",
+      "items": ["최근접점 대응 후 SE(2) 최소제곱 정합", "고정 반복과 임계값으로 계산량 제한"]
+    }
+  ]
+}

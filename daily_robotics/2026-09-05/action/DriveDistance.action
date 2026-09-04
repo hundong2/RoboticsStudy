@@ -1,0 +1,16 @@
+# Goal: 기준 시점에서 로봇이 이동해야 하는 부호 있는 거리[m].
+float64 distance_m
+# Goal: 절댓값 기준 최대 선속도[m/s].
+float64 max_speed_mps
+---
+# Result: 허용 오차 안에 목표 거리에 도달했는지 나타낸다.
+bool reached
+# Result: 실제로 적분된 최종 이동 거리[m].
+float64 final_distance_m
+# Result: 성공·취소·실패 원인을 사람이 읽을 수 있게 전달한다.
+string message
+---
+# Feedback: Action 실행 중 현재까지 이동한 부호 있는 거리[m].
+float64 distance_traveled_m
+# Feedback: 목표까지 남은 절댓값 거리[m].
+float64 distance_remaining_m

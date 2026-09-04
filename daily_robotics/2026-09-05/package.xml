@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>daily_robotics_2026_09_05</name>
+  <version>0.1.0</version>
+  <description>ROS 2 actions, PREEMPT_RT-aware control-loop boundaries, and bounded 2D ICP scan matching.</description>
+  <maintainer email="maintainer@example.com">Robotics Study Maintainer</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
+  <depend>sensor_msgs</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <!-- 인터페이스 생성 패키지를 ROS 인덱스의 표준 그룹에 등록한다. -->
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
