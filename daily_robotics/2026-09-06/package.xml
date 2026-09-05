@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>daily_robotics_2026_09_06</name>
+  <version>0.1.0</version>
+  <description>ROS 2 services and lifecycle, QoS deadline/liveliness monitoring, and a planar EKF.</description>
+  <maintainer email="maintainer@example.com">Robotics Study Maintainer</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>lifecycle_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <!-- 이 패키지가 사용자 정의 ROS 인터페이스를 제공함을 패키지 인덱스에 등록한다. -->
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,8 @@
+# EKF 상태를 이 위치와 자세로 재초기화한다. 단위는 m, rad이다.
+float64 x
+float64 y
+float64 yaw
+---
+# 요청이 실제로 적용되었는지와 사람이 읽을 수 있는 이유를 돌려준다.
+bool accepted
+string message

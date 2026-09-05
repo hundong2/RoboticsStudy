@@ -86,6 +86,42 @@ Q = sigma_a^2 * [[dt^4/4, dt^3/2],
 - SLAM: 상태/공분산 크기 증가에 대비한 sparse factor graph
 - 비가우시안/다봉 분포: particle filter 또는 mixture model
 
+## EKF: 비선형 이동 모델을 현재 추정값 주변에서 펴기
+
+선형 Kalman Filter의 `F x`, `H x` 대신 비선형 함수 `f(x,u)`, `h(x)`를 쓴다.
+
+```text
+x_k^- = f(x_(k-1), u_k)
+F_k   = df/dx |_(현재 선형화점)
+P_k^- = F_k P_(k-1) F_k^T + Q_k
+
+y_k = z_k - h(x_k^-)
+H_k = dh/dx |_(현재 선형화점)
+```
+
+평면 로봇 `x=[p_x,p_y,yaw]`, `u=[v,omega]`에서는 다음과 같다.
+
+```text
+f(x,u) = [p_x + v cos(yaw)dt,
+          p_y + v sin(yaw)dt,
+          yaw + omega dt]
+
+F = [[1, 0, -v sin(yaw)dt],
+     [0, 1,  v cos(yaw)dt],
+     [0, 0,              1]]
+```
+
+EKF 오차는 잡음 튜닝뿐 아니라 **선형화점**에 민감하다. 측정을 지나치게 늦게 반영하면 다음 Jacobian도 나쁜 상태 주변에서 계산될 수 있다. timestamp 순서 보장, out-of-sequence measurement 처리, angle normalization, innovation gating이 제품 품질에 직접 영향을 준다.
+
+공분산 update는 가능하면 Joseph form을 사용한다.
+
+```text
+P = (I-KH)P^-(I-KH)^T + K R K^T
+```
+
+기본식보다 계산량은 많지만 부동소수점 환경에서 대칭성과 양의 준정부호를 보존하기 쉽다.
+
 ## 연결 실습
 
 - [`../../daily_robotics/2026-09-02/src/rt_kalman_fusion.cpp`](../../daily_robotics/2026-09-02/src/rt_kalman_fusion.cpp)
+- [`../../daily_robotics/2026-09-06/src/lifecycle_ekf_node.cpp`](../../daily_robotics/2026-09-06/src/lifecycle_ekf_node.cpp)
