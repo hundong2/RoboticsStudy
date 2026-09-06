@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ROS 2 컴포넌트 기반 DWA 제어 파이프라인",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1120, 650]
+  },
+  "components": [
+    {
+      "id": "operator",
+      "type": "external",
+      "label": "운영자 / 튜너",
+      "sublabel": "ros2 param set",
+      "pos": [75, 95],
+      "size": [155, 70]
+    },
+    {
+      "id": "sensor",
+      "type": "backend",
+      "label": "SensorSimulator",
+      "sublabel": "LaserScan + Odometry",
+      "tag": "unique_ptr publish",
+      "pos": [75, 300],
+      "size": [175, 82]
+    },
+    {
+      "id": "planner",
+      "type": "backend",
+      "label": "DwaPlanner",
+      "sublabel": "고정 용량 궤적 평가",
+      "tag": "동적 파라미터 검증",
+      "pos": [360, 290],
+      "size": [190, 102]
+    },
+    {
+      "id": "guard",
+      "type": "security",
+      "label": "CommandGuard",
+      "sublabel": "속도·가속도 제한",
+      "tag": "fail-safe clamp",
+      "pos": [665, 300],
+      "size": [175, 82]
+    },
+    {
+      "id": "drive",
+      "type": "external",
+      "label": "구동 제어기",
+      "sublabel": "/cmd_vel consumer",
+      "pos": [950, 300],
+      "size": [150, 82]
+    },
+    {
+      "id": "executor",
+      "type": "messagebus",
+      "label": "component_container_mt",
+      "sublabel": "MultiThreadedExecutor",
+      "pos": [438, 500],
+      "size": [235, 72]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "단일 프로세스 · use_intra_process_comms=true",
+      "wraps": ["sensor", "planner", "guard", "executor"],
+      "pad": 34
+    }
+  ],
+  "connections": [
+    {
+      "id": "parameter-update",
+      "from": "operator",
+      "to": "planner",
+      "label": "파라미터 서비스",
+      "variant": "dashed"
+    },
+    {
+      "id": "sensor-stream",
+      "from": "sensor",
+      "to": "planner",
+      "label": "/scan · /odom",
+      "variant": "emphasis",
+      "labelDy": 65
+    },
+    {
+      "id": "raw-command",
+      "from": "planner",
+      "to": "guard",
+      "label": "/cmd_vel_raw · unique_ptr",
+      "variant": "emphasis",
+      "labelDy": -45
+    },
+    {
+      "id": "safe-command",
+      "from": "guard",
+      "to": "drive",
+      "label": "/cmd_vel",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "메모리 경로",
+      "items": [
+        "단일 프로세스에서 unique_ptr 메시지 소유권 전달",
+        "DWA hot path는 std::array로 용량을 고정"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "DWA",
+      "items": [
+        "가속도 한계로 동적 속도창 생성",
+        "제동 가능 후보만 목표·속도·여유도로 채점"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "안전 경계",
+      "items": [
+        "CommandGuard가 최종 속도와 가속도 제한",
+        "잘못된 파라미터는 적용 전에 거부"
+      ]
+    }
+  ]
+}
