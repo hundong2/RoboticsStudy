@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "차동구동 제어와 Monte Carlo Localization",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1220, 520],
+    "views": [
+      {
+        "id": "motor-command-path",
+        "label": "모터 명령 경로",
+        "focus": ["simulator", "cmd-topic", "io-executor", "command-buffer", "control-executor", "wheel-buffer"],
+        "note": "비-RT 명령 수신에서 100 Hz 제어 thread까지 atomic handoff를 따라갑니다."
+      },
+      {
+        "id": "localization-path",
+        "label": "위치추정 경로",
+        "focus": ["wheel-topic", "scan-topic", "localizer", "pose-topic"],
+        "note": "encoder motion model과 Lidar measurement model이 particle belief에서 합쳐집니다."
+      },
+      {
+        "id": "executor-boundary",
+        "label": "Executor 격리",
+        "focus": ["io-executor", "command-buffer", "control-executor", "wheel-buffer"],
+        "note": "ROS 통신 작업과 motor hot path가 서로 다른 executor/thread에 배치됩니다."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "simulator",
+      "type": "external",
+      "label": "SensorSimulator",
+      "sublabel": "command + 16-beam scan / 20 Hz",
+      "tag": "ground truth",
+      "pos": [40, 195],
+      "size": [160, 72]
+    },
+    {
+      "id": "cmd-topic",
+      "type": "messagebus",
+      "label": "/cmd_vel",
+      "sublabel": "geometry_msgs/Twist",
+      "pos": [260, 50],
+      "size": [150, 66]
+    },
+    {
+      "id": "io-executor",
+      "type": "backend",
+      "label": "I/O Executor",
+      "sublabel": "command + telemetry callbacks",
+      "tag": "일반 thread",
+      "pos": [480, 50],
+      "size": [170, 72]
+    },
+    {
+      "id": "command-buffer",
+      "type": "database",
+      "label": "Atomic Command",
+      "sublabel": "linear · angular · timestamp",
+      "tag": "일관된 snapshot",
+      "pos": [730, 50],
+      "size": [170, 72]
+    },
+    {
+      "id": "control-executor",
+      "type": "backend",
+      "label": "Control Executor",
+      "sublabel": "differential drive / 100 Hz",
+      "tag": "SCHED_FIFO 60 요청",
+      "pos": [980, 50],
+      "size": [180, 72]
+    },
+    {
+      "id": "wheel-buffer",
+      "type": "database",
+      "label": "Atomic Wheel State",
+      "sublabel": "left · right · timestamp",
+      "tag": "고정 크기",
+      "pos": [730, 200],
+      "size": [170, 72]
+    },
+    {
+      "id": "wheel-topic",
+      "type": "messagebus",
+      "label": "/wheel_states",
+      "sublabel": "sensor_msgs/JointState / 50 Hz",
+      "pos": [730, 330],
+      "size": [170, 66]
+    },
+    {
+      "id": "scan-topic",
+      "type": "messagebus",
+      "label": "/scan",
+      "sublabel": "sensor_msgs/LaserScan / 20 Hz",
+      "pos": [335, 430],
+      "size": [170, 66]
+    },
+    {
+      "id": "localizer",
+      "type": "backend",
+      "label": "ParticleLocalizer",
+      "sublabel": "predict · correct · resample",
+      "tag": "200 particles",
+      "pos": [980, 330],
+      "size": [180, 72]
+    },
+    {
+      "id": "pose-topic",
+      "type": "messagebus",
+      "label": "/mcl_pose",
+      "sublabel": "PoseWithCovarianceStamped",
+      "pos": [980, 430],
+      "size": [180, 66]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "PriorityMotorController 프로세스",
+      "wraps": ["io-executor", "command-buffer", "control-executor", "wheel-buffer"],
+      "pad": 28
+    }
+  ],
+  "connections": [
+    {"id": "publish-command", "from": "simulator", "to": "cmd-topic", "label": "Reliable publish", "variant": "emphasis"},
+    {"id": "receive-command", "from": "cmd-topic", "to": "io-executor", "label": "최신 명령 수신", "labelAt": [445, 136]},
+    {"id": "write-command", "from": "io-executor", "to": "command-buffer", "label": "single writer"},
+    {"id": "read-command", "from": "command-buffer", "to": "control-executor", "label": "lock-free read", "variant": "emphasis"},
+    {"id": "write-wheel-state", "from": "control-executor", "to": "wheel-buffer", "label": "차동구동 적분"},
+    {"id": "publish-encoder", "from": "wheel-buffer", "to": "wheel-topic", "label": "I/O thread publish", "labelAt": [815, 286]},
+    {"id": "encoder-motion", "from": "wheel-topic", "to": "localizer", "label": "motion model", "variant": "emphasis"},
+    {"id": "publish-scan", "from": "simulator", "to": "scan-topic", "label": "BestEffort publish", "variant": "dashed"},
+    {"id": "scan-likelihood", "from": "scan-topic", "to": "localizer", "label": "measurement model", "variant": "emphasis", "labelAt": [956, 416]},
+    {"id": "publish-pose", "from": "localizer", "to": "pose-topic", "label": "pose + covariance", "labelAt": [1070, 416]}
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "기초: 차동구동",
+      "items": [
+        "(v, ω)를 좌우 wheel angular velocity로 변환",
+        "encoder Δφ에서 Δs와 Δyaw를 복원"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "RT 경계",
+      "items": [
+        "제어와 DDS callback을 별도 executor/thread로 격리",
+        "atomic payload + sequence로 snapshot 일관성 확인"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "위치추정",
+      "items": [
+        "encoder predict와 Lidar likelihood를 결합",
+        "N_eff가 100 미만일 때 systematic resampling"
+      ]
+    }
+  ]
+}
