@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "2026-09-12 카메라–LiDAR Visual Odometry 파이프라인",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1390, 650]
+  },
+  "components": [
+    {
+      "id": "sensor_simulator",
+      "type": "external",
+      "label": "sensor_simulator",
+      "sublabel": "결정론적 landmark·stamp 생성",
+      "pos": [40, 260],
+      "size": [180, 72]
+    },
+    {
+      "id": "camera_topic",
+      "type": "messagebus",
+      "label": "/camera/features",
+      "sublabel": "단위 bearing PointCloud",
+      "pos": [300, 130],
+      "size": [190, 68]
+    },
+    {
+      "id": "lidar_topic",
+      "type": "messagebus",
+      "label": "/lidar/features",
+      "sublabel": "metric XY PointCloud",
+      "pos": [300, 390],
+      "size": [190, 68]
+    },
+    {
+      "id": "time_sync",
+      "type": "backend",
+      "label": "approximate_time_sync",
+      "sublabel": "20 ms skew·bearing gate",
+      "tag": "message_filters",
+      "pos": [570, 260],
+      "size": [210, 76]
+    },
+    {
+      "id": "metric_topic",
+      "type": "messagebus",
+      "label": "/sync/metric_features",
+      "sublabel": "검증된 최대 32쌍",
+      "pos": [860, 260],
+      "size": [200, 68]
+    },
+    {
+      "id": "vo_estimator",
+      "type": "backend",
+      "label": "bounded_vo_estimator",
+      "sublabel": "SE(2) 정합·outlier trimming",
+      "tag": "fixed hot path",
+      "pos": [1140, 260],
+      "size": [220, 76]
+    },
+    {
+      "id": "ground_truth",
+      "type": "messagebus",
+      "label": "/sim/ground_truth",
+      "sublabel": "검증 전용 Odometry",
+      "pos": [30, 520],
+      "size": [200, 68]
+    },
+    {
+      "id": "vo_auditor",
+      "type": "backend",
+      "label": "vo_auditor",
+      "sublabel": "position·yaw error 판정",
+      "pos": [1140, 500],
+      "size": [220, 72]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "ROS 2 graph / SensorDataQoS",
+      "wraps": [
+        "sensor_simulator",
+        "camera_topic",
+        "lidar_topic",
+        "time_sync",
+        "metric_topic",
+        "vo_estimator",
+        "ground_truth",
+        "vo_auditor"
+      ],
+      "pad": 24
+    }
+  ],
+  "connections": [
+    {
+      "id": "publish_camera",
+      "from": "sensor_simulator",
+      "to": "camera_topic",
+      "label": "33 Hz bearing",
+      "variant": "default"
+    },
+    {
+      "id": "publish_lidar",
+      "from": "sensor_simulator",
+      "to": "lidar_topic",
+      "label": "+6…18 ms stamp",
+      "variant": "default"
+    },
+    {
+      "id": "camera_to_sync",
+      "from": "camera_topic",
+      "to": "time_sync",
+      "label": "ApproximateTime",
+      "variant": "emphasis"
+    },
+    {
+      "id": "lidar_to_sync",
+      "from": "lidar_topic",
+      "to": "time_sync",
+      "label": "ApproximateTime",
+      "variant": "emphasis"
+    },
+    {
+      "id": "publish_metric_pairs",
+      "from": "time_sync",
+      "to": "metric_topic",
+      "label": "skew≤20 ms",
+      "variant": "emphasis"
+    },
+    {
+      "id": "estimate_motion",
+      "from": "metric_topic",
+      "to": "vo_estimator",
+      "label": "bounded SE(2)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "publish_ground_truth",
+      "from": "sensor_simulator",
+      "to": "ground_truth",
+      "label": "truth pose",
+      "variant": "dashed",
+      "labelAt": [130, 346]
+    },
+    {
+      "id": "truth_to_auditor",
+      "from": "ground_truth",
+      "to": "vo_auditor",
+      "label": "reference",
+      "variant": "dashed"
+    },
+    {
+      "id": "estimate_to_auditor",
+      "from": "vo_estimator",
+      "to": "vo_auditor",
+      "label": "/vo/odometry",
+      "variant": "default",
+      "labelAt": [1250, 350]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "시간 계약",
+      "items": [
+        "Header stamp 기준 ApproximateTime pairing",
+        "20 ms를 넘는 pair는 알고리즘에 넣지 않음"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "결정론 경계",
+      "items": [
+        "최대 32개 correspondence와 2-pass 정합",
+        "ROS 메시지 allocation은 hard RT 범위 밖"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "알고리즘",
+      "items": [
+        "현재 feature를 이전 frame에 SE(2) 정합",
+        "metric LiDAR depth로 monocular scale 모호성 제거"
+      ]
+    }
+  ]
+}
