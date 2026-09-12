@@ -1,0 +1,8 @@
+<library path="mock_arm_system">
+  <class
+    name="daily_robotics_2026_09_13/MockArmSystem"
+    type="daily_robotics_2026_09_13::MockArmSystem"
+    base_class_type="hardware_interface::SystemInterface">
+    <description>속도 제한 위치 servo를 모사하는 2축 ros2_control 학습용 SystemInterface</description>
+  </class>
+</library>

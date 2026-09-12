@@ -1,0 +1,24 @@
+controller_manager:
+  ros__parameters:
+    # read -> update -> write 루프를 250 Hz로 실행한다. target hardware에서 실제 WCET를 별도 측정해야 한다.
+    update_rate: 250
+    enforce_command_limits: true
+    hardware_components_initial_state:
+      # 로드 직후 configure까지만 수행하고, launch에서 의도적으로 active 전이를 호출한다.
+      inactive:
+        - StudyArm
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    ik_controller:
+      type: daily_robotics_2026_09_13/DlsIkController
+
+ik_controller:
+  ros__parameters:
+    joints:
+      - shoulder_joint
+      - elbow_joint
+    link_1_m: 1.0
+    link_2_m: 0.8
+    cartesian_gain: 3.0
+    max_joint_speed_rad_s: 1.5

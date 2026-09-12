@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot name="study_arm">
+  <link name="base_link"/>
+  <link name="link_1"/>
+  <link name="tool0"/>
+
+  <joint name="shoulder_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.8" upper="2.8" effort="20" velocity="2.0"/>
+  </joint>
+  <joint name="elbow_joint" type="revolute">
+    <parent link="link_1"/>
+    <child link="tool0"/>
+    <origin xyz="1.0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.6" upper="2.6" effort="15" velocity="2.0"/>
+  </joint>
+
+  <!-- ros2_control tag는 kinematic URDF와 driver/controller interface 계약을 연결한다. -->
+  <ros2_control name="StudyArm" type="system">
+    <hardware>
+      <!-- pluginlib XML의 name과 정확히 같아야 Resource Manager가 공유 라이브러리를 찾는다. -->
+      <plugin>daily_robotics_2026_09_13/MockArmSystem</plugin>
+    </hardware>
+    <joint name="shoulder_joint">
+      <command_interface name="position" min="-2.8" max="2.8"/>
+      <state_interface name="position" initial_value="0.35"/>
+    </joint>
+    <joint name="elbow_joint">
+      <command_interface name="position" min="-2.6" max="2.6"/>
+      <state_interface name="position" initial_value="0.55"/>
+    </joint>
+  </ros2_control>
+</robot>

@@ -1,0 +1,8 @@
+<library path="dls_ik_controller">
+  <class
+    name="daily_robotics_2026_09_13/DlsIkController"
+    type="daily_robotics_2026_09_13::DlsIkController"
+    base_class_type="controller_interface::ControllerInterface">
+    <description>Damped Least Squares로 2R 말단 목표를 추종하는 실시간 제어 plugin</description>
+  </class>
+</library>
