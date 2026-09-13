@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- 실제 Nav2 bt_navigator에 옮길 수 있는 구조 계약이다. 오늘의 축소 C++ navigator는 이 의미만 재현한다. -->
+<root BTCPP_format="4" main_tree_to_execute="NavigateReactive">
+  <BehaviorTree ID="NavigateReactive">
+    <RecoveryNode number_of_retries="2" name="NavigateRecovery">
+      <PipelineSequence name="ReplanningPipeline">
+        <!-- RateController는 FollowPath가 RUNNING인 동안에도 1 Hz로 전역 계획을 다시 계산하게 한다. -->
+        <RateController hz="1.0">
+          <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+        </RateController>
+        <FollowPath path="{path}" controller_id="FollowPath"/>
+      </PipelineSequence>
+      <!-- 파이프라인 실패 시 국소 costmap을 지우고 잠시 정지한 뒤 루트가 재시도한다. -->
+      <Sequence name="ContextualRecovery">
+        <ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/>
+        <Wait wait_duration="1.0"/>
+      </Sequence>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

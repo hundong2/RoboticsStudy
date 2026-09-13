@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "2026-09-14 반응형 Navigation 안전 파이프라인",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1390, 760],
+    "views": [
+      {
+        "id": "planning-flow",
+        "label": "경로 최적화 흐름",
+        "focus": ["world-source", "dds-filter", "band-optimizer", "bt-navigator"],
+        "note": "전역 경로와 관심 장애물이 bounded elastic band를 거쳐 추종 정책으로 전달된다."
+      },
+      {
+        "id": "safety-flow",
+        "label": "Deadline 안전 흐름",
+        "focus": ["band-optimizer", "bt-navigator", "deadline-guard", "robot-base"],
+        "note": "150 ms heartbeat deadline을 넘으면 supervisor가 raw 명령 대신 0 속도를 강제한다."
+      },
+      {
+        "id": "audit-flow",
+        "label": "독립 검증 흐름",
+        "focus": ["band-optimizer", "bt-navigator", "deadline-guard", "contract-auditor"],
+        "note": "auditor는 내부 상태가 아니라 topic 출력만으로 경로·필터·정지·복구 계약을 판정한다."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "world-source",
+      "type": "external",
+      "label": "World Simulator",
+      "sublabel": "Path + 장애물 4개 · 20 Hz",
+      "tag": "입력",
+      "pos": [45, 300],
+      "size": [210, 72]
+    },
+    {
+      "id": "dds-filter",
+      "type": "messagebus",
+      "label": "DDS Content Filter",
+      "sublabel": "-0.1 ≤ obstacle.x ≤ 4.2",
+      "tag": "reader-side",
+      "pos": [270, 475],
+      "size": [185, 72]
+    },
+    {
+      "id": "band-optimizer",
+      "type": "backend",
+      "label": "Elastic Band Optimizer",
+      "sublabel": "21 knots · 8 obstacles · 8회",
+      "tag": "20 Hz bounded",
+      "pos": [490, 300],
+      "size": [195, 76]
+    },
+    {
+      "id": "bt-navigator",
+      "type": "backend",
+      "label": "Reactive BT Navigator",
+      "sublabel": "PipelineSequence + RecoveryNode",
+      "tag": "20 Hz tick",
+      "pos": [750, 300],
+      "size": [195, 76]
+    },
+    {
+      "id": "deadline-guard",
+      "type": "security",
+      "label": "Deadline Supervisor",
+      "sublabel": "Critical / Telemetry executors",
+      "tag": "150 ms fail-safe",
+      "pos": [1000, 300],
+      "size": [190, 76]
+    },
+    {
+      "id": "robot-base",
+      "type": "external",
+      "label": "Robot Base",
+      "sublabel": "안전한 /cmd_vel 소비",
+      "tag": "출력",
+      "pos": [1220, 302],
+      "size": [150, 72]
+    },
+    {
+      "id": "contract-auditor",
+      "type": "database",
+      "label": "Trajectory Auditor",
+      "sublabel": "Topic-only 계약 판정",
+      "tag": "PASS / WAIT",
+      "pos": [750, 560],
+      "size": [195, 76]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "ROS 2 / DDS planning domain",
+      "wraps": ["dds-filter", "band-optimizer", "bt-navigator", "deadline-guard", "contract-auditor"],
+      "pad": 26
+    },
+    {
+      "kind": "security-group",
+      "label": "Fail-safe command boundary",
+      "wraps": ["deadline-guard"],
+      "pad": 18
+    }
+  ],
+  "connections": [
+    {
+      "id": "global-path",
+      "from": "world-source",
+      "to": "band-optimizer",
+      "label": "global Path · Transient Local",
+      "variant": "emphasis"
+    },
+    {
+      "id": "obstacle-stream",
+      "from": "world-source",
+      "to": "dds-filter",
+      "label": "ObstacleSample × 4",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "filtered-obstacles",
+      "from": "dds-filter",
+      "to": "band-optimizer",
+      "label": "관심 표본만 callback",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "variant": "emphasis"
+    },
+    {
+      "id": "local-trajectory",
+      "from": "band-optimizer",
+      "to": "bt-navigator",
+      "label": "time-parameterized Path",
+      "labelAt": [720, 250],
+      "variant": "emphasis"
+    },
+    {
+      "id": "planner-heartbeat",
+      "from": "band-optimizer",
+      "to": "deadline-guard",
+      "label": "heartbeat · 20 Hz",
+      "fromSide": "top",
+      "toSide": "left",
+      "variant": "security"
+    },
+    {
+      "id": "raw-command",
+      "from": "bt-navigator",
+      "to": "deadline-guard",
+      "label": "/cmd_vel_raw",
+      "labelAt": [972, 260]
+    },
+    {
+      "id": "safety-stop",
+      "from": "deadline-guard",
+      "to": "bt-navigator",
+      "label": "/safety/stop",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "variant": "security"
+    },
+    {
+      "id": "safe-command",
+      "from": "deadline-guard",
+      "to": "robot-base",
+      "label": "/cmd_vel 또는 0 Twist",
+      "labelAt": [1205, 390],
+      "route": "straight",
+      "variant": "security"
+    },
+    {
+      "id": "optimizer-evidence",
+      "from": "band-optimizer",
+      "to": "contract-auditor",
+      "label": "trajectory + CFT 진단",
+      "labelAt": [650, 500],
+      "fromSide": "bottom",
+      "toSide": "left",
+      "variant": "dashed"
+    },
+    {
+      "id": "bt-evidence",
+      "from": "bt-navigator",
+      "to": "contract-auditor",
+      "label": "BT 상태",
+      "labelAt": [805, 470],
+      "fromSide": "bottom",
+      "toSide": "top",
+      "variant": "dashed"
+    },
+    {
+      "id": "safety-evidence",
+      "from": "deadline-guard",
+      "to": "contract-auditor",
+      "label": "stop + safe command",
+      "labelAt": [1075, 500],
+      "fromSide": "bottom",
+      "toSide": "right",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "반응형 계획",
+      "items": ["FollowPath 중에도 계획 조건을 재평가", "전역 재계획과 국소 변형의 책임 분리"]
+    },
+    {
+      "dot": "violet",
+      "title": "Bounded hot path",
+      "items": ["최대 21 × 8 × 8 연산 구조", "RMW 미지원 시 software filter fallback"]
+    },
+    {
+      "dot": "rose",
+      "title": "독립 안전 계층",
+      "items": ["150 ms heartbeat deadline", "critical executor가 0 속도를 강제"]
+    }
+  ]
+}
