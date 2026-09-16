@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "IMU 사전적분과 재생 시각 계약",
+    "quality_profile": "showcase",
+    "viewBox": [1100, 660]
+  },
+  "components": [
+    { "id": "source", "type": "backend", "label": "imu_simulator", "sublabel": "벽시계 구동 · 결정적 샘플", "pos": [65, 250], "size": [210, 82] },
+    { "id": "clock", "type": "messagebus", "label": "/clock", "sublabel": "sim time · 점프 가능", "pos": [385, 95], "size": [180, 76] },
+    { "id": "imu", "type": "messagebus", "label": "/imu/data", "sublabel": "Header.stamp · 100 Hz", "pos": [380, 255], "size": [190, 76] },
+    { "id": "integrator", "type": "backend", "label": "imu_preintegrator", "sublabel": "고정 큐 · 최대 16개/주기", "pos": [705, 250], "size": [220, 82] },
+    { "id": "odom", "type": "messagebus", "label": "/imu/delta", "sublabel": "상대 위치 · 속도 · yaw", "pos": [710, 420], "size": [210, 76] },
+    { "id": "audit", "type": "backend", "label": "integration_auditor", "sublabel": "해석해 비교 · PASS/FAIL", "pos": [385, 425], "size": [220, 82] }
+  ],
+  "connections": [
+    { "id": "simclock", "from": "source", "to": "clock", "label": "sim time", "fromSide": "top", "toSide": "left" },
+    { "id": "sample", "from": "source", "to": "imu", "label": "IMU 샘플" },
+    { "id": "feed", "from": "imu", "to": "integrator", "label": "bounded enqueue" },
+    { "id": "result", "from": "integrator", "to": "odom", "label": "relative delta", "fromSide": "bottom", "toSide": "top", "labelAt": [815, 346] },
+    { "id": "check", "from": "odom", "to": "audit", "label": "오차 감사", "fromSide": "left", "toSide": "right", "labelAt": [686, 510] },
+    { "id": "timeuse", "from": "clock", "to": "integrator", "label": "use_sim_time", "fromSide": "right", "toSide": "top" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "시간의 기준", "items": ["적분 dt는 도착 시간이 아니라 IMU Header.stamp 차이", "시계 점프 시 누적 상태 초기화"] },
+    { "dot": "amber", "title": "실시간 경계", "items": ["콜백은 고정 배열에 복사하고 50 Hz 루프가 최대 16개 처리", "최악 실행시간 보증은 별도 계측과 RT 환경이 필요"] }
+  ]
+}
