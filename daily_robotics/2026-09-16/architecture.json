@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "IMU-LiDAR 시간 정렬과 고정용량 센서 융합",
+    "quality_profile": "showcase",
+    "viewBox": [1320, 760]
+  },
+  "components": [
+    {
+      "id": "imu_sim",
+      "type": "external",
+      "label": "IMU 시뮬레이터",
+      "sublabel": "200 Hz · 기준 시계",
+      "pos": [50, 150],
+      "size": [170, 68]
+    },
+    {
+      "id": "lidar_sim",
+      "type": "external",
+      "label": "LiDAR 시뮬레이터",
+      "sublabel": "20 Hz · +35 ms 지연",
+      "pos": [50, 390],
+      "size": [170, 68]
+    },
+    {
+      "id": "bounded_buffers",
+      "type": "messagebus",
+      "label": "고정용량 표본 버퍼",
+      "sublabel": "timestamp + yaw rate",
+      "pos": [330, 270],
+      "size": [190, 76],
+      "tag": "callback path"
+    },
+    {
+      "id": "offset_estimator",
+      "type": "backend",
+      "label": "시간 오프셋 추정기",
+      "sublabel": "bounded grid + 포물선 보간",
+      "pos": [640, 150],
+      "size": [210, 76],
+      "tag": "2 Hz worker"
+    },
+    {
+      "id": "rate_fusion",
+      "type": "backend",
+      "label": "분산 가중 융합기",
+      "sublabel": "지연 보정 yaw-rate",
+      "pos": [640, 390],
+      "size": [210, 76],
+      "tag": "bounded compute"
+    },
+    {
+      "id": "auditor",
+      "type": "security",
+      "label": "독립 검증 노드",
+      "sublabel": "오프셋·RMSE·샘플 수",
+      "pos": [980, 270],
+      "size": [190, 76]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "비실시간 ROS 2 통신 경계",
+      "wraps": ["imu_sim", "lidar_sim", "auditor"],
+      "pad": 20
+    },
+    {
+      "kind": "security-group",
+      "label": "할당 없는 계산 경로",
+      "wraps": ["bounded_buffers", "offset_estimator", "rate_fusion"],
+      "pad": 18
+    }
+  ],
+  "connections": [
+    {
+      "from": "imu_sim",
+      "to": "bounded_buffers",
+      "label": "/imu/yaw_rate · SensorDataQoS",
+      "variant": "emphasis"
+    },
+    {
+      "from": "lidar_sim",
+      "to": "bounded_buffers",
+      "label": "/lidar/yaw_rate · SensorDataQoS",
+      "variant": "emphasis"
+    },
+    {
+      "from": "bounded_buffers",
+      "to": "offset_estimator",
+      "label": "고정용량 snapshot"
+    },
+    {
+      "from": "offset_estimator",
+      "to": "rate_fusion",
+      "label": "추정 Δt",
+      "variant": "security",
+      "labelAt": [745, 240]
+    },
+    {
+      "from": "bounded_buffers",
+      "to": "rate_fusion",
+      "label": "시간 보간 표본"
+    },
+    {
+      "from": "offset_estimator",
+      "to": "auditor",
+      "label": "/calibration/status"
+    },
+    {
+      "from": "rate_fusion",
+      "to": "auditor",
+      "label": "/fusion/yaw_rate"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "시간 계약",
+      "items": [
+        "Header.stamp는 측정 시각이며 콜백 도착 시각과 다르다",
+        "LiDAR의 알려지지 않은 지연을 IMU 기준으로 추정한다"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "결정론 경계",
+      "items": [
+        "콜백은 고정 배열에 복사한 뒤 즉시 반환한다",
+        "탐색 범위·간격·샘플 수로 최악 실행량을 제한한다"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "융합 결과",
+      "items": [
+        "추정 오프셋으로 LiDAR 표본 시각을 보정한다",
+        "센서 분산의 역수를 가중치로 사용해 yaw-rate를 합친다"
+      ]
+    }
+  ]
+}

@@ -38,6 +38,28 @@ e_{angle}\approx |\omega|\Delta t
 - Arrival time 대신 Header stamp 기반 latency와 pair skew를 각각 계측
 - 센서 rate가 다를 때 한 sample의 재사용 허용 여부를 명시
 
+## 온라인 시간 오프셋 추정
+
+Hardware trigger/PTP를 쓸 수 없거나 driver pipeline의 고정 지연이 남으면 시간 offset `Δt`를 calibration 변수로 둘 수 있다. 센서 B의 stamp가 실제 측정 시각보다 `Δt`만큼 앞선다는 규약에서는
+
+\[
+t_{physical}=t_B-\Delta t,\qquad
+J(\Delta t)=\sum_i \|z_B(t_i)-\hat z_A(t_i-\Delta t)\|_{W_i}^2
+\]
+
+를 최소화한다. `z_A`는 고속 센서의 보간값이며 `W_i`는 noise covariance의 역수다.
+
+중요한 실무 조건은 **motion excitation**이다. 정지하거나 변화가 거의 없는 구간에서는 어느 offset도 비슷한 residual을 내므로 관측 불가능하다. 주기 운동 하나만 있으면 한 주기 차이의 여러 local minimum이 생길 수 있다. 여러 주파수/축의 회전과 가속을 포함하고, 최솟값 주변 curvature 또는 추정 covariance로 신뢰도를 판단한다.
+
+Constant offset만으로 부족한 장시간 기록은 clock skew까지 포함한다.
+
+\[
+\Delta t(t)=\Delta t_0+\kappa(t-t_0)
+\]
+
+Online 제품에서는 search range, candidate 수, window 크기, iteration을 고정해 계산 상한을 두고, excitation 부족·경계해·residual 증가 시 마지막 정상 calibration으로 fallback해야 한다.
+
 ## 참고
 
 - [ROS 2 Jazzy message_filters — Approximate Time Synchronizer](https://docs.ros.org/en/ros2_packages/jazzy/api/message_filters/doc/Tutorials/Approximate-Synchronizer-Cpp.html)
+- [Furgale et al., Unified Temporal and Spatial Calibration for Multi-Sensor Systems, IROS 2013](https://doi.org/10.1109/IROS.2013.6696514)
