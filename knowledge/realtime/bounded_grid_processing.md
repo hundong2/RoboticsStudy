@@ -28,3 +28,7 @@
 ## 점진 처리 대안
 
 큰 지도를 한 callback에서 전부 처리할 수 없다면 매 tick의 cell quota를 정하고 state machine으로 여러 주기에 나눈다. 이때 map version을 붙여 중간 계산 중 새 지도가 오면 안전하게 취소/재시작해야 한다.
+
+## LaserScan → OccupancyGrid 사례 (2026-09-18)
+
+`daily_robotics/2026-09-18`은 스캔 181광선, 광선당 80개의 5 cm 샘플, 지도 80×80셀로 상한을 고정한다. 센서 콜백은 최신 스캔용 `std::array<float,181>`에 복사하고 이전 미처리 값은 계수한 뒤 교체한다. 처리 타이머는 최대 14,480번의 샘플 검사와 6,400셀의 지도 직렬화를 한다. 이 수치는 **반복 횟수의 상한**이며 실행 시간 상한이 아니다. `OccupancyGrid`의 동적 벡터와 `publish()`/DDS, executor를 별도 계측해야 전체 지연이나 hard RT를 논할 수 있다.
