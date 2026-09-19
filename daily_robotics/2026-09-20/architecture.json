@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "micro-ROS 전송 예산과 지형 통과성 파이프라인",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1390, 760]
+  },
+  "components": [
+    { "id": "sample_timer", "type": "external", "label": "20 Hz 샘플 타이머", "sublabel": "주기 시작점", "pos": [50, 115], "size": [150, 62] },
+    { "id": "height_sensor", "type": "external", "label": "8×8 높이 센서", "sublabel": "고정 크기 패치", "pos": [50, 315], "size": [150, 62] },
+    { "id": "rclc_executor", "type": "backend", "label": "rclc 실행 의미", "sublabel": "LET 순서 모델", "pos": [265, 250], "size": [155, 68], "tag": "MCU" },
+    { "id": "xrce_client", "type": "messagebus", "label": "XRCE Client", "sublabel": "고정 payload", "pos": [485, 250], "size": [145, 68], "tag": "MCU" },
+    { "id": "xrce_agent", "type": "messagebus", "label": "XRCE Agent", "sublabel": "직렬화·조각화 경계", "pos": [705, 250], "size": [155, 68], "tag": "Host" },
+    { "id": "dds_bus", "type": "cloud", "label": "ROS 2 DDS", "sublabel": "SensorDataQoS", "pos": [930, 250], "size": [145, 68], "tag": "Host" },
+    { "id": "traversability", "type": "backend", "label": "통과성 추정기", "sublabel": "경사 + 거칠기 비용", "pos": [1140, 250], "size": [165, 68], "tag": "Host" },
+    { "id": "cost_grid", "type": "database", "label": "OccupancyGrid", "sublabel": "0 안전 · 100 위험", "pos": [1140, 470], "size": [165, 68] },
+    { "id": "budget_monitor", "type": "security", "label": "전송 예산 감시기", "sublabel": "조각 수·wire bytes", "pos": [705, 470], "size": [155, 68] },
+    { "id": "safety_auditor", "type": "security", "label": "독립 안전 감사기", "sublabel": "예산·비용·시퀀스", "pos": [930, 610], "size": [175, 68] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "제약 MCU 경계", "wraps": ["sample_timer", "height_sensor", "rclc_executor", "xrce_client"], "pad": 20 },
+    { "kind": "region", "label": "Linux / ROS 2 호스트", "wraps": ["xrce_agent", "dds_bus", "traversability", "cost_grid", "budget_monitor", "safety_auditor"], "pad": 22 }
+  ],
+  "connections": [
+    { "from": "sample_timer", "to": "rclc_executor", "label": "주기 트리거", "variant": "dashed" },
+    { "from": "height_sensor", "to": "rclc_executor", "label": "64개 높이값" },
+    { "from": "rclc_executor", "to": "xrce_client", "label": "take → compute → publish", "variant": "emphasis", "labelAt": [453, 332] },
+    { "from": "xrce_client", "to": "xrce_agent", "label": "XRCE-DDS / UDP", "variant": "emphasis" },
+    { "from": "xrce_agent", "to": "dds_bus", "label": "DDS 변환" },
+    { "from": "dds_bus", "to": "traversability", "label": "/terrain_patch", "labelAt": [1108, 332] },
+    { "from": "traversability", "to": "cost_grid", "label": "/traversability_grid", "labelAt": [1223, 352] },
+    { "from": "xrce_agent", "to": "budget_monitor", "label": "payload·MTU", "variant": "dashed", "labelAt": [783, 352] },
+    { "from": "budget_monitor", "to": "safety_auditor", "label": "/transport_stats", "variant": "security" },
+    { "from": "cost_grid", "to": "safety_auditor", "label": "위험 셀 검증", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "실행 순서", "items": ["타이머마다 입력을 한 번 취하고 계산 후 발행", "고정 크기 메시지로 메모리·직렬화 상한을 유지"] },
+    { "dot": "amber", "title": "전송 예산", "items": ["MTU에서 XRCE/UDP/IP 헤더를 제외해 조각 수 계산", "조각화와 유실 가능성을 진단값으로 노출"] },
+    { "dot": "emerald", "title": "알고리즘", "items": ["중앙차분 경사와 3×3 표준편차를 비용으로 결합", "감사 노드는 생성 노드와 독립된 식으로 결과를 검사"] }
+  ]
+}
