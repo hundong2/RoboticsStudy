@@ -9,3 +9,9 @@
 2026-09-18 실습은 라이다가 map 원점에 고정되어 있어 `frame_id=map`이라고 직접 둔다. 움직이는 로봇에서는 각 스캔의 시각에 맞는 TF로 광선을 지도 좌표에 투영해야 한다. `range==range_max`를 free-only로 다루는 규칙은 그 실습 시뮬레이터의 선택이다.
 
 참고: [Jazzy LaserScan 원본 메시지](https://github.com/ros2/common_interfaces/blob/jazzy/sensor_msgs/msg/LaserScan.msg), [Jazzy SensorDataQoS](https://docs.ros.org/en/jazzy/p/rclcpp/generated/classrclcpp_1_1SensorDataQoS.html).
+
+## 2026-09-21 확장 — rolling scan과 TF cache
+
+움직이는 센서에서는 `header.stamp`와 마지막 광선 시각 `stamp+(N-1)×time_increment`가 모두 TF cache 안에 있어야 한다. 최신 TF(`TimePointZero`)를 동적 pose에 쓰면 모든 광선을 도착 시각의 pose로 잘못 투영한다. exact-time lookup 실패를 과거 최신 pose로 조용히 대체하면 map 왜곡을 숨길 수 있으므로, 스캔 drop·제한된 extrapolation·odometry fallback 중 하나를 명시하고 카운터로 관측한다.
+
+광선마다 TF lookup을 반복하는 대신 sweep 시작/끝 pose를 가져와 보간할 수 있다. 이는 bounded 계산에 유리하지만 constant-velocity에 가까운 짧은 구간이라는 모델 가정이다. 가속이 큰 플랫폼에서는 IMU/encoder trajectory와 per-point time을 사용하고, 보간 오차를 pose covariance 또는 map quality metric으로 감시한다.

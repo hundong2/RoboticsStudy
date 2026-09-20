@@ -39,3 +39,7 @@ temp/
 build/
 install/
 log/
+
+# Python bytecode generated while checking ROS 2 launch files
+__pycache__/
+*.pyc

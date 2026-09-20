@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "TF 시간 인지 LiDAR Deskew 지도화",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1395, 720],
+    "views": [
+      {
+        "id": "sensor-time",
+        "label": "센서 시간 계약",
+        "focus": ["trajectory", "simulator", "tf_buffer", "scan_bus"],
+        "note": "rolling scan의 첫 시각·광선 간격과 과거 TF cache를 함께 읽습니다."
+      },
+      {
+        "id": "deskew-path",
+        "label": "Deskew 계산 경로",
+        "focus": ["tf_buffer", "scan_bus", "mapper", "deskew_map"],
+        "note": "시작·끝 exact-time TF를 보간해 광선을 map frame에 정렬합니다."
+      },
+      {
+        "id": "independent-audit",
+        "label": "독립 품질 검증",
+        "focus": ["raw_map", "deskew_map", "auditor", "audit_result"],
+        "note": "raw 대비 벽 오차와 집중도 개선을 별도 노드가 판정합니다."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "trajectory",
+      "type": "external",
+      "label": "연속 SE(2) 궤적",
+      "sublabel": "이동·회전 ground truth",
+      "pos": [20, 285],
+      "size": [150, 72]
+    },
+    {
+      "id": "simulator",
+      "type": "backend",
+      "label": "moving_scan_simulator",
+      "sublabel": "100 Hz TF · 10 Hz LaserScan",
+      "pos": [210, 285],
+      "size": [188, 72],
+      "tag": "181 beams / 100 ms"
+    },
+    {
+      "id": "scan_bus",
+      "type": "messagebus",
+      "label": "ROS 2 DDS",
+      "sublabel": "/scan · SensorDataQoS",
+      "pos": [440, 285],
+      "size": [160, 72]
+    },
+    {
+      "id": "tf_buffer",
+      "type": "database",
+      "label": "TF2 Buffer",
+      "sublabel": "/tf + /tf_static 시간 캐시",
+      "pos": [340, 100],
+      "size": [180, 72],
+      "tag": "exact-time lookup"
+    },
+    {
+      "id": "mapper",
+      "type": "backend",
+      "label": "motion_compensated_mapper",
+      "sublabel": "SE(2) 보간 · bounded ray update",
+      "pos": [640, 285],
+      "size": [216, 76],
+      "tag": "TF 3회 / scan"
+    },
+    {
+      "id": "raw_map",
+      "type": "database",
+      "label": "Raw OccupancyGrid",
+      "sublabel": "모든 광선 = 시작 pose",
+      "pos": [900, 150],
+      "size": [180, 70]
+    },
+    {
+      "id": "deskew_map",
+      "type": "database",
+      "label": "Deskewed OccupancyGrid",
+      "sublabel": "광선별 pose + 신뢰도",
+      "pos": [900, 390],
+      "size": [180, 70],
+      "tag": "uncertainty weighted"
+    },
+    {
+      "id": "auditor",
+      "type": "security",
+      "label": "map_quality_auditor",
+      "sublabel": "벽 오차 · 집중도 · 처리 상한",
+      "pos": [1130, 285],
+      "size": [216, 74]
+    },
+    {
+      "id": "audit_result",
+      "type": "external",
+      "label": "회귀 검증 결과",
+      "sublabel": "/mapping/audit PASS · FAIL",
+      "pos": [1148, 505],
+      "size": [180, 74]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "ROS 2 Jazzy 교육 런타임",
+      "wraps": ["simulator", "scan_bus", "tf_buffer", "mapper", "raw_map", "deskew_map", "auditor"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "trajectory-input",
+      "from": "trajectory",
+      "to": "simulator",
+      "label": "시간별 pose",
+      "variant": "emphasis",
+      "labelDy": -30
+    },
+    {
+      "id": "scan-stream",
+      "from": "simulator",
+      "to": "scan_bus",
+      "label": "stamp + time_increment",
+      "variant": "emphasis",
+      "labelDy": -32
+    },
+    {
+      "id": "tf-stream",
+      "from": "simulator",
+      "to": "tf_buffer",
+      "label": "map→base + base→laser",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "scan-delivery",
+      "from": "scan_bus",
+      "to": "mapper",
+      "label": "best-effort sensor stream",
+      "variant": "emphasis",
+      "labelDy": -32
+    },
+    {
+      "id": "tf-lookups",
+      "from": "tf_buffer",
+      "to": "mapper",
+      "label": "시작·끝 exact-time TF",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "raw-output",
+      "from": "mapper",
+      "to": "raw_map",
+      "label": "왜곡 비교 기준",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "deskew-output",
+      "from": "mapper",
+      "to": "deskew_map",
+      "label": "보간·가중 지도",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [878, 375]
+    },
+    {
+      "id": "raw-audit",
+      "from": "raw_map",
+      "to": "auditor",
+      "label": "벽 오차 기준",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "deskew-audit",
+      "from": "deskew_map",
+      "to": "auditor",
+      "label": "벽 오차 개선",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "stats-audit",
+      "from": "mapper",
+      "to": "auditor",
+      "label": "beams · steps · TF 실패",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [988, 268]
+    },
+    {
+      "id": "audit-verdict",
+      "from": "auditor",
+      "to": "audit_result",
+      "label": "독립 PASS / FAIL",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [1090, 474]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "시간 계약",
+      "items": [
+        "LaserScan stamp는 첫 광선 시각",
+        "TF cache는 sweep 시작부터 끝까지 포함"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Bounded 계산",
+      "items": [
+        "최대 181 beams × 100 ray steps",
+        "시작·끝·static TF 조회 3회"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "검증 경계",
+      "items": [
+        "raw 대비 벽 오차와 두께 개선",
+        "교육용 2D 모델이며 hard RT 증명 아님"
+      ]
+    }
+  ]
+}
