@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ROS 2 IMM 액추에이터 고장 감지와 안전 정지",
+    "quality_profile": "showcase",
+    "viewBox": [1390, 760]
+  },
+  "components": [
+    {
+      "id": "plant_sim",
+      "type": "external",
+      "label": "actuator_simulator",
+      "sublabel": "200 Hz 명령·속도·고장 주입",
+      "pos": [48, 270],
+      "size": [184, 78]
+    },
+    {
+      "id": "request_topic",
+      "type": "messagebus",
+      "label": "/actuator/requested_command",
+      "sublabel": "Float64 · Reliable",
+      "pos": [286, 100],
+      "size": [214, 72]
+    },
+    {
+      "id": "state_topic",
+      "type": "messagebus",
+      "label": "/joint_states",
+      "sublabel": "JointState · Deadline/Liveliness",
+      "pos": [286, 420],
+      "size": [214, 72]
+    },
+    {
+      "id": "fault_supervisor",
+      "type": "backend",
+      "label": "imm_fault_supervisor",
+      "sublabel": "2모델 IMM + bounded 상태 머신",
+      "pos": [562, 270],
+      "size": [216, 78]
+    },
+    {
+      "id": "safe_topic",
+      "type": "security",
+      "label": "/actuator/safe_command",
+      "sublabel": "NORMAL 전달 · SAFE_STOP 0",
+      "pos": [900, 270],
+      "size": [230, 72]
+    },
+    {
+      "id": "diagnostics_topic",
+      "type": "messagebus",
+      "label": "/diagnostics",
+      "sublabel": "확률·사유·지연·QoS 카운터",
+      "pos": [562, 520],
+      "size": [230, 72]
+    },
+    {
+      "id": "independent_auditor",
+      "type": "security",
+      "label": "safety_auditor",
+      "sublabel": "고장 감지·정지·회복 독립 검증",
+      "pos": [900, 520],
+      "size": [216, 78]
+    },
+    {
+      "id": "audit_topic",
+      "type": "messagebus",
+      "label": "/actuator/audit",
+      "sublabel": "Transient Local PASS/FAIL",
+      "pos": [1180, 520],
+      "size": [200, 72]
+    }
+  ],
+  "connections": [
+    {
+      "id": "sim-to-request",
+      "from": "plant_sim",
+      "to": "request_topic",
+      "label": "요청 속도",
+      "variant": "default"
+    },
+    {
+      "id": "request-to-supervisor",
+      "from": "request_topic",
+      "to": "fault_supervisor",
+      "label": "목표 입력 u(k)",
+      "variant": "default"
+    },
+    {
+      "id": "sim-to-state",
+      "from": "plant_sim",
+      "to": "state_topic",
+      "label": "측정 z(k) · heartbeat",
+      "variant": "emphasis"
+    },
+    {
+      "id": "state-to-supervisor",
+      "from": "state_topic",
+      "to": "fault_supervisor",
+      "label": "샘플 + DDS 이벤트",
+      "variant": "emphasis"
+    },
+    {
+      "id": "supervisor-to-safe",
+      "from": "fault_supervisor",
+      "to": "safe_topic",
+      "label": "rate-limited 명령",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [839, 252]
+    },
+    {
+      "id": "supervisor-to-diagnostics",
+      "from": "fault_supervisor",
+      "to": "diagnostics_topic",
+      "label": "20 Hz 비RT 스냅샷",
+      "variant": "default",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "safe-to-auditor",
+      "from": "safe_topic",
+      "to": "independent_auditor",
+      "label": "정지 출력 확인",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "diagnostics-to-auditor",
+      "from": "diagnostics_topic",
+      "to": "independent_auditor",
+      "label": "상태·근거 확인",
+      "variant": "default",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [846, 506]
+    },
+    {
+      "id": "auditor-to-result",
+      "from": "independent_auditor",
+      "to": "audit_topic",
+      "label": "PASS / FAIL",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [1148, 506]
+    }
+  ]
+}
