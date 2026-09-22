@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "접촉 안전 임피던스 제어 학습 시스템",
+    "quality_profile": "showcase",
+    "viewBox": [1200, 720]
+  },
+  "components": [
+    {
+      "id": "target",
+      "type": "external",
+      "label": "목표 생성기",
+      "sublabel": "접촉 위치 목표",
+      "pos": [42, 254],
+      "size": [154, 76]
+    },
+    {
+      "id": "controller",
+      "type": "backend",
+      "label": "임피던스 제어기",
+      "sublabel": "외란 관측·500 Hz 연산",
+      "pos": [250, 254],
+      "size": [174, 76]
+    },
+    {
+      "id": "stop",
+      "type": "security",
+      "label": "안전 명령 게이트",
+      "sublabel": "정지 시 토크 0 고정",
+      "pos": [500, 254],
+      "size": [174, 76]
+    },
+    {
+      "id": "plant",
+      "type": "backend",
+      "label": "관절·접촉 시뮬레이터",
+      "sublabel": "질량-스프링-댐퍼",
+      "pos": [750, 254],
+      "size": [184, 76]
+    },
+    {
+      "id": "auditor",
+      "type": "security",
+      "label": "에너지 안전 감사기",
+      "sublabel": "수동성·힘·지연 검증",
+      "pos": [750, 96],
+      "size": [184, 76]
+    },
+    {
+      "id": "report",
+      "type": "database",
+      "label": "검증 결과",
+      "sublabel": "오차·에너지·실행시간",
+      "pos": [1010, 254],
+      "size": [154, 76]
+    }
+  ],
+  "connections": [
+    {
+      "id": "target_to_controller",
+      "from": "target",
+      "to": "controller",
+      "label": "/contact/target",
+      "variant": "emphasis",
+      "labelDy": -42
+    },
+    {
+      "id": "controller_to_stop",
+      "from": "controller",
+      "to": "stop",
+      "label": "/joint_effort_cmd",
+      "variant": "emphasis",
+      "labelDy": -42
+    },
+    {
+      "id": "stop_to_plant",
+      "from": "stop",
+      "to": "plant",
+      "label": "허용 토크",
+      "variant": "emphasis",
+      "labelDy": -42,
+      "labelDx": -48
+    },
+    {
+      "id": "plant_to_auditor",
+      "from": "plant",
+      "to": "auditor",
+      "label": "상태·힘·에너지",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelDx": 82
+    },
+    {
+      "id": "auditor_to_stop",
+      "from": "auditor",
+      "to": "stop",
+      "label": "3회 연속 위반",
+      "variant": "emphasis"
+    },
+    {
+      "id": "auditor_to_report",
+      "from": "auditor",
+      "to": "report",
+      "label": "PASS / FAIL",
+      "labelDy": -42
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "실시간 경계",
+      "items": [
+        "500 Hz 제어 계산은 고정 크기 상태만 사용",
+        "ROS 메시지 직렬화는 저주기 경계로 분리"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "안전 경계",
+      "items": [
+        "관측기 추정값만으로 안전을 단정하지 않음",
+        "감사기가 힘·에너지·샘플 지연을 독립 검사"
+      ]
+    }
+  ]
+}
