@@ -1,0 +1,34 @@
+# Goal: 3축 관절의 시작 위치[rad]. 고정 길이 배열이라 관절 수가 실행 중 바뀌지 않는다.
+float64[3] start_position_rad
+# Goal: 시작 속도[rad/s]. 0이 아닌 경계조건도 연속적으로 연결할 수 있다.
+float64[3] start_velocity_rad_s
+# Goal: 시작 가속도[rad/s^2].
+float64[3] start_acceleration_rad_s2
+# Goal: 종료 위치[rad].
+float64[3] goal_position_rad
+# Goal: 종료 속도[rad/s]. 정지 목표만 가정하지 않기 위해 명시한다.
+float64[3] goal_velocity_rad_s
+# Goal: 종료 가속도[rad/s^2].
+float64[3] goal_acceleration_rad_s2
+# Goal: 전체 실행 시간. 서버는 이 시간 동안 정규화된 5차 다항식을 샘플링한다.
+builtin_interfaces/Duration duration
+# Goal: 종료 시 허용할 최대 관절 위치 오차[rad].
+float64 position_tolerance_rad
+---
+# Result: 허용오차와 수치 검증을 모두 통과했는지 나타낸다.
+bool success
+# Result: 실행 중 관측한 3축 최대 위치 오차[rad].
+float64 max_position_error_rad
+# Result: 500 Hz 계산 루프가 처리한 tick 수.
+uint64 control_ticks
+# Result: 성공·취소·실패의 이유를 사람이 읽을 수 있게 전달한다.
+string message
+---
+# Feedback: Goal 시작 이후 경과 시간.
+builtin_interfaces/Duration elapsed
+# Feedback: 최신 목표 위치[rad].
+float64[3] desired_position_rad
+# Feedback: 최신 모의 관절 위치[rad].
+float64[3] actual_position_rad
+# Feedback: 현재 3축 최대 위치 오차[rad].
+float64 current_position_error_rad

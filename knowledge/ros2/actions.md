@@ -43,6 +43,16 @@ Action 정의는 두 개의 `---`로 Goal, Result, Feedback을 나눈다.
 ## 관련 실습
 
 - `daily_robotics/2026-09-05`: custom `DriveDistance.action`, 단일 Goal 예약, Feedback/Result, RT 루프 handoff
+- `daily_robotics/2026-09-25`: 3축 비영점 경계조건 Action, goal tolerance, 500 Hz fixed plan/50 Hz feedback 분리, 독립 추종 감사
+
+## 2026-09-25 확장 — 궤적 Action의 허용오차와 RT 경계
+
+- Action Goal은 원하는 경계상태와 허용오차를 전달하고, 고주기 제어용 계수/command는 서버의 비 RT callback에서 미리 만든다.
+- Feedback 주기는 control 주기보다 낮아도 된다. 500 Hz 제어를 관측하기 위해 500 Hz DDS Feedback을 강제하면 직렬화 비용과 네트워크 부하만 커질 수 있다.
+- Goal reservation은 validation 뒤 원자적으로 수행해 거의 동시에 온 두 요청이 모두 수락되지 않게 한다.
+- Result의 `SUCCEEDED`는 단순 시간 만료가 아니라 terminal tolerance 만족을 뜻해야 한다.
+- Cancel 수락과 제한 준수 정지는 별도 상태다. 실장비에서는 braking trajectory 또는 drive-level stop의 완료를 Result에 반영한다.
+- 자세한 경계 패턴은 [`knowledge/realtime/action_control_boundary.md`](../realtime/action_control_boundary.md)에 정리한다.
 
 ## 참고 자료
 
