@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "3D LiDAR-IMU Deskew 학습 아키텍처",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1360, 700],
+    "views": [
+      {"id": "sensor-time", "label": "센서 시간 계약", "focus": ["simulator", "imu-topic", "raw-topic", "deskew"], "note": "IMU 시각과 PointCloud2의 header.stamp + time 필드가 만나는 경로입니다."},
+      {"id": "bounded-kernel", "label": "고정용량 수치 경로", "focus": ["imu-topic", "raw-topic", "deskew", "corrected-topic", "stats-topic"], "note": "512 IMU·128 point 상한과 6x6 covariance 전파 경계를 봅니다."},
+      {"id": "independent-audit", "label": "독립 품질 감사", "focus": ["raw-topic", "corrected-topic", "stats-topic", "auditor", "pass"], "note": "raw/보정 평면 잔차와 진단 통계를 별도 노드가 교차 검증합니다."}
+    ]
+  },
+  "components": [
+    {"id": "simulator", "type": "external", "label": "lidar_imu_simulator", "sublabel": "200 Hz IMU · 10 Hz cloud", "pos": [40, 270], "size": [190, 72]},
+    {"id": "imu-topic", "type": "messagebus", "label": "/study/imu", "sublabel": "sensor_msgs/Imu", "pos": [300, 135], "size": [170, 64]},
+    {"id": "raw-topic", "type": "messagebus", "label": "/study/cloud_raw", "sublabel": "PointCloud2 x/y/z/time", "pos": [300, 390], "size": [170, 64]},
+    {"id": "deskew", "type": "backend", "label": "imu_deskew_node", "sublabel": "SO(3) 적분 · 6x6 covariance", "tag": "fixed capacity", "pos": [555, 250], "size": [210, 86]},
+    {"id": "corrected-topic", "type": "messagebus", "label": "/study/cloud_deskewed", "sublabel": "scan-end frame", "pos": [845, 145], "size": [200, 64]},
+    {"id": "stats-topic", "type": "messagebus", "label": "/study/deskew_stats", "sublabel": "bias · sigma · timing", "pos": [845, 390], "size": [200, 64]},
+    {"id": "auditor", "type": "security", "label": "deskew_auditor", "sublabel": "독립 평면 잔차 감사", "pos": [1115, 260], "size": [185, 76]},
+    {"id": "pass", "type": "external", "label": "/study/audit_pass", "sublabel": "Transient Local Bool", "pos": [1115, 515], "size": [185, 64]}
+  ],
+  "boundaries": [
+    {"kind": "region", "label": "ROS 2 Jazzy DDS graph", "wraps": ["imu-topic", "raw-topic", "deskew", "corrected-topic", "stats-topic", "auditor"]}
+  ],
+  "connections": [
+    {"id": "publish-imu", "from": "simulator", "to": "imu-topic", "label": "SensorDataQoS · 5 ms", "variant": "emphasis"},
+    {"id": "publish-raw", "from": "simulator", "to": "raw-topic", "label": "start stamp + point time", "variant": "emphasis"},
+    {"id": "imu-input", "from": "imu-topic", "to": "deskew", "label": "bias 초기화 · ring 512"},
+    {"id": "cloud-input", "from": "raw-topic", "to": "deskew", "label": "최대 128 points"},
+    {"id": "corrected-output", "from": "deskew", "to": "corrected-topic", "label": "R_end^T R_i p_i", "variant": "emphasis"},
+    {"id": "stats-output", "from": "deskew", "to": "stats-topic", "label": "P=F P F^T+Q"},
+    {"id": "raw-audit", "from": "raw-topic", "to": "auditor", "label": "raw plane residual", "variant": "dashed", "fromSide": "bottom", "toSide": "right", "via": [[385, 620], [1345, 620], [1345, 298]]},
+    {"id": "corrected-audit", "from": "corrected-topic", "to": "auditor", "label": "deskewed residual"},
+    {"id": "stats-audit", "from": "stats-topic", "to": "auditor", "label": "bias · sigma · budget"},
+    {"id": "publish-pass", "from": "auditor", "to": "pass", "label": "5회 연속 계약 통과", "variant": "security", "labelDy": 24}
+  ],
+  "cards": [
+    {"dot": "cyan", "title": "시간 계약", "items": ["header.stamp = 스캔 시작", "time = 점별 상대 초(float32)", "IMU가 전체 스캔을 bracket해야 처리"]},
+    {"dot": "violet", "title": "실시간 경계", "items": ["IMU 512·scan IMU 64·point 128 고정 상한", "SingleThreadedExecutor 직렬 접근", "DDS 직렬화는 hard-RT 경계 밖"]},
+    {"dot": "emerald", "title": "독립 검증", "items": ["raw 대비 평면 잔차 80% 이상 감소", "gyro bias 오차·회전 sigma 점검", "관측 callback 시간은 WCET 증명이 아님"]}
+  ]
+}
