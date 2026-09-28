@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "3-DoF Operational-Space Control Lab",
+    "quality_profile": "showcase",
+    "viewBox": [1370, 760],
+    "views": [
+      {
+        "id": "closed-loop",
+        "label": "Closed-loop path",
+        "focus": ["plant", "joint-state", "controller", "torque-command"],
+        "note": "JointState feedback drives bounded operational-space torque computation and closes the simulated plant loop."
+      },
+      {
+        "id": "audit-path",
+        "label": "Independent audit",
+        "focus": ["joint-state", "control-stats", "auditor"],
+        "note": "The auditor observes state and controller evidence without participating in the command path."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "plant",
+      "type": "backend",
+      "label": "arm_plant",
+      "sublabel": "3-DoF dynamics · 500 Hz",
+      "pos": [50, 275],
+      "size": [180, 76],
+      "tag": "simulation"
+    },
+    {
+      "id": "joint-state",
+      "type": "messagebus",
+      "label": "/arm/joint_states",
+      "sublabel": "sensor_msgs/JointState",
+      "pos": [360, 275],
+      "size": [190, 76]
+    },
+    {
+      "id": "controller",
+      "type": "backend",
+      "label": "operational_space_controller",
+      "sublabel": "fixed 3x3/2x2 math · 500 Hz",
+      "pos": [720, 275],
+      "size": [230, 76],
+      "tag": "bounded hot path"
+    },
+    {
+      "id": "torque-command",
+      "type": "messagebus",
+      "label": "/arm/torque_command",
+      "sublabel": "Float64MultiArray",
+      "pos": [1080, 275],
+      "size": [190, 76]
+    },
+    {
+      "id": "control-stats",
+      "type": "messagebus",
+      "label": "/arm/control_stats",
+      "sublabel": "ControlStats",
+      "pos": [740, 520],
+      "size": [190, 76]
+    },
+    {
+      "id": "auditor",
+      "type": "security",
+      "label": "control_auditor",
+      "sublabel": "tracking · leakage · timing",
+      "pos": [360, 520],
+      "size": [190, 76],
+      "tag": "independent observer"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "ROS 2 Jazzy process graph",
+      "wraps": ["plant", "joint-state", "controller", "torque-command", "control-stats", "auditor"],
+      "pad": 30
+    }
+  ],
+  "connections": [
+    {
+      "id": "plant-publishes-state",
+      "from": "plant",
+      "to": "joint-state",
+      "label": "publish stamped q, qdot",
+      "variant": "emphasis"
+    },
+    {
+      "id": "state-drives-controller",
+      "from": "joint-state",
+      "to": "controller",
+      "label": "best-effort depth 1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "controller-publishes-torque",
+      "from": "controller",
+      "to": "torque-command",
+      "label": "bounded tau[3]",
+      "variant": "emphasis"
+    },
+    {
+      "id": "torque-closes-loop",
+      "from": "torque-command",
+      "to": "plant",
+      "label": "apply saturated effort",
+      "variant": "emphasis",
+      "fromSide": "top",
+      "toSide": "top"
+    },
+    {
+      "id": "controller-publishes-stats",
+      "from": "controller",
+      "to": "control-stats",
+      "label": "50 Hz evidence",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "state-to-auditor",
+      "from": "joint-state",
+      "to": "auditor",
+      "label": "observe q, qdot",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "variant": "dashed",
+      "labelDy": 24
+    },
+    {
+      "id": "stats-to-auditor",
+      "from": "control-stats",
+      "to": "auditor",
+      "label": "audit primary/null-space metrics",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Control law",
+      "items": [
+        "Primary task: end-effector Cartesian tracking",
+        "Secondary task: dynamically consistent null-space posture"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Determinism contract",
+      "items": [
+        "Fixed-size stack matrices only in the 500 Hz kernel",
+        "Singularity damping and torque saturation are always active"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Audit boundary",
+      "items": [
+        "Observer is outside the torque command path",
+        "Sampled timing is evidence, not a WCET proof"
+      ]
+    }
+  ]
+}

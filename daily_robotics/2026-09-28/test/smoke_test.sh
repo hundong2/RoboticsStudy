@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+# install/setup.bash가 source된 colcon 작업공간에서 실행한다.
+# 독립 ROS_DOMAIN_ID로 다른 DDS 실습 노드와 discovery가 섞이지 않게 한다.
+export ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-136}"
+
+tmp_dir="$(mktemp -d)"
+launch_log="${tmp_dir}/launch.log"
+cleanup() {
+  if [[ -n "${launch_pid:-}" ]]; then
+    kill -TERM -- "-${launch_pid}" 2>/dev/null || true
+    for _ in $(seq 1 20); do
+      kill -0 "${launch_pid}" 2>/dev/null || break
+      sleep 0.1
+    done
+    kill -KILL -- "-${launch_pid}" 2>/dev/null || true
+    wait "${launch_pid}" 2>/dev/null || true
+  fi
+  rm -rf "${tmp_dir}"
+}
+trap cleanup EXIT
+
+# 새 process group에서 launch해 종료 시 세 노드가 함께 정리되도록 한다.
+setsid ros2 launch daily_robotics_2026_09_28 study.launch.py >"${launch_log}" 2>&1 &
+launch_pid=$!
+
+for _ in $(seq 1 45); do
+  if timeout 2 ros2 topic echo --once /study/audit_pass std_msgs/msg/Bool 2>/dev/null | grep -q 'data: true'; then
+    grep 'AUDIT_PASS' "${launch_log}" | tail -n 1 || true
+    echo "SMOKE_PASS: operational-space/null-space 제어 독립 감사 통과"
+    exit 0
+  fi
+  if ! kill -0 "${launch_pid}" 2>/dev/null; then
+    cat "${launch_log}"
+    echo "SMOKE_FAIL: launch가 조기 종료됨" >&2
+    exit 1
+  fi
+  sleep 1
+done
+
+cat "${launch_log}"
+echo "SMOKE_FAIL: 45초 안에 audit_pass=true를 받지 못함" >&2
+exit 1
