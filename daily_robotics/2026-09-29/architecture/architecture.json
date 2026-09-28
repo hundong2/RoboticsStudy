@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "GNSS/오도메트리 Fixed-Lag 융합 구조",
+    "quality_profile": "showcase",
+    "viewBox": [1240, 650]
+  },
+  "components": [
+    {
+      "id": "sensor_simulator",
+      "type": "external",
+      "label": "sensor_simulator",
+      "sublabel": "20 Hz wheel · 5 Hz GNSS",
+      "pos": [20, 220],
+      "size": [155, 72]
+    },
+    {
+      "id": "sensor_topics",
+      "type": "messagebus",
+      "label": "Sensor topics",
+      "sublabel": "/wheel/odometry · /gnss/fix",
+      "pos": [275, 220],
+      "size": [155, 72]
+    },
+    {
+      "id": "fixed_lag_smoother",
+      "type": "backend",
+      "label": "fixed_lag_smoother",
+      "sublabel": "8 poses · 4 IRLS",
+      "pos": [530, 220],
+      "size": [155, 72]
+    },
+    {
+      "id": "fusion_topics",
+      "type": "messagebus",
+      "label": "Fusion topics",
+      "sublabel": "/fusion/odometry + stats",
+      "pos": [785, 220],
+      "size": [155, 72]
+    },
+    {
+      "id": "fusion_auditor",
+      "type": "security",
+      "label": "fusion_auditor",
+      "sublabel": "independent truth check",
+      "pos": [1040, 220],
+      "size": [170, 72]
+    },
+    {
+      "id": "truth_topic",
+      "type": "messagebus",
+      "label": "/sim/ground_truth",
+      "sublabel": "same-stamp reference",
+      "pos": [275, 420],
+      "size": [155, 72]
+    },
+    {
+      "id": "smoke_test",
+      "type": "external",
+      "label": "smoke_test.sh",
+      "sublabel": "latched PASS consumer",
+      "pos": [1040, 420],
+      "size": [170, 72]
+    }
+  ],
+  "connections": [
+    {
+      "id": "publish_sensor_samples",
+      "from": "sensor_simulator",
+      "to": "sensor_topics",
+      "label": "publish",
+      "variant": "emphasis"
+    },
+    {
+      "id": "consume_sensor_samples",
+      "from": "sensor_topics",
+      "to": "fixed_lag_smoother",
+      "label": "timed samples"
+    },
+    {
+      "id": "publish_fusion",
+      "from": "fixed_lag_smoother",
+      "to": "fusion_topics",
+      "label": "fused state",
+      "variant": "emphasis"
+    },
+    {
+      "id": "audit_fusion",
+      "from": "fusion_topics",
+      "to": "fusion_auditor",
+      "label": "estimate + stats"
+    },
+    {
+      "id": "publish_truth",
+      "from": "sensor_simulator",
+      "to": "truth_topic",
+      "label": "same stamp"
+    },
+    {
+      "id": "compare_truth",
+      "from": "truth_topic",
+      "to": "fusion_auditor",
+      "label": "reference"
+    },
+    {
+      "id": "publish_pass",
+      "from": "fusion_auditor",
+      "to": "smoke_test",
+      "label": "latched PASS",
+      "labelAt": [1125, 306],
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "결정론적 수치 경계",
+      "items": ["8 poses / 16 variables maximum", "4 IRLS iterations and fixed arrays"]
+    },
+    {
+      "dot": "amber",
+      "title": "독립 품질 감사",
+      "items": ["GNSS outlier downweighting", "Marginalization, covariance, error, timing"]
+    }
+  ]
+}

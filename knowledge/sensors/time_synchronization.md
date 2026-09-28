@@ -59,6 +59,18 @@ Constant offset만으로 부족한 장시간 기록은 clock skew까지 포함�
 
 Online 제품에서는 search range, candidate 수, window 크기, iteration을 고정해 계산 상한을 두고, excitation 부족·경계해·residual 증가 시 마지막 정상 calibration으로 fallback해야 한다.
 
+## Fixed-lag window에서의 측정 association
+
+저속 GNSS와 고속 odometry처럼 rate가 다르면 새 GNSS를 “가장 최근 arrival”에 붙이지 말고 활성 state 중 `Header.stamp` 차이가 가장 작은 후보에 연결한다.
+
+1. 후보를 fixed-capacity window 안에서만 검색한다.
+2. `|t_state-t_measurement|≤Δt_max`를 만족할 때만 factor를 만든다.
+3. 선택된 skew, 거부 수, window 밖으로 늦게 도착한 측정 수를 계측한다.
+4. 한 측정을 여러 state에 재사용하는지 정책을 명시한다.
+5. Delayed measurement가 이미 marginalize된 상태를 가리키면 drop, state augmentation, out-of-sequence update 중 하나를 의도적으로 선택한다.
+
+`ApproximateTime` callback을 썼더라도 estimator 내부에서 최대 skew와 message age를 다시 검사해야 한다. Synchronizer가 pair를 만들었다는 사실은 그 pair가 물리적으로 안전하다는 보장이 아니다.
+
 ## 참고
 
 - [ROS 2 Jazzy message_filters — Approximate Time Synchronizer](https://docs.ros.org/en/ros2_packages/jazzy/api/message_filters/doc/Tutorials/Approximate-Synchronizer-Cpp.html)
