@@ -37,3 +37,16 @@
 ## 안전한 주장
 
 “고정 크기이고 평균 20 us였다”는 구조 및 관측 결과다. “500 Hz deadline을 항상 만족한다”는 WCET/스케줄링/부하/하드웨어 조건까지 검증해야 하는 별도 주장이다.
+
+## 2xN Jacobian의 싼 condition 계산
+
+평면 task의 `J`가 `2xN`이면 큰 SVD 없이 `A=J J^T`의 2개 고유값을 닫힌식으로 구할 수 있다.
+
+```text
+lambda_(max,min) = (trace(A) +/- sqrt((a00-a11)^2 + 4*a01^2)) / 2
+cond(J) = sqrt(lambda_max / lambda_min)
+```
+
+`lambda_min`이 threshold 아래면 rank loss로 처리한다. condition이 커질 때 `J^T(JJ^T+lambda^2 I)^-1` 형태의 DLS를 켜면 속도 폭주를 줄일 수 있지만, exact task residual은 증가한다. 따라서 `condition`, `lambda`, `task_scale`, `||Jq_dot-sx_dot||`을 한 묶음으로 관측해야 한다.
+
+관련 실습: `daily_robotics/2026-10-01`

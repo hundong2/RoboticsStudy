@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ROS 2 SNS 관절 속도 제어 아키텍처",
+    "quality_profile": "showcase",
+    "viewBox": [1240, 720],
+    "views": [
+      {
+        "id": "control-loop",
+        "label": "제어 루프",
+        "focus": ["simulator", "joint_state", "cartesian_target", "controller", "safe_command"],
+        "note": "상태와 목표가 고정 크기 SNS 커널을 거쳐 제한 내 관절 명령으로 바뀌는 경로입니다."
+      },
+      {
+        "id": "safety-audit",
+        "label": "안전 감사",
+        "focus": ["controller", "safe_command", "sns_status", "auditor"],
+        "note": "실행 노드와 독립된 감사 노드가 포화, 잔차, 순번 계약을 검증합니다."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "simulator",
+      "type": "backend",
+      "label": "redundant_arm_simulator",
+      "sublabel": "3R 관절 상태·Cartesian 목표 생성",
+      "pos": [52, 260],
+      "size": [210, 82]
+    },
+    {
+      "id": "joint_state",
+      "type": "messagebus",
+      "label": "/joint_states",
+      "sublabel": "sensor_msgs/JointState · 100 Hz",
+      "pos": [320, 120],
+      "size": [196, 72]
+    },
+    {
+      "id": "cartesian_target",
+      "type": "messagebus",
+      "label": "/cartesian_velocity_target",
+      "sublabel": "geometry_msgs/TwistStamped · 100 Hz",
+      "pos": [320, 380],
+      "size": [232, 72]
+    },
+    {
+      "id": "controller",
+      "type": "backend",
+      "label": "sns_joint_velocity_controller",
+      "sublabel": "3회 이하 SNS · task scaling · 조건수 감시",
+      "tag": "500 Hz bounded kernel",
+      "pos": [610, 250],
+      "size": [250, 96]
+    },
+    {
+      "id": "safe_command",
+      "type": "messagebus",
+      "label": "/joint_velocity_command",
+      "sublabel": "제한을 만족한 3축 속도 명령",
+      "pos": [940, 120],
+      "size": [226, 72]
+    },
+    {
+      "id": "sns_status",
+      "type": "messagebus",
+      "label": "/sns/status",
+      "sublabel": "scale·조건수·잔차·포화 마스크",
+      "pos": [940, 380],
+      "size": [226, 72]
+    },
+    {
+      "id": "auditor",
+      "type": "security",
+      "label": "sns_safety_auditor",
+      "sublabel": "독립 순번·한계·재구성 오차 검사",
+      "pos": [940, 560],
+      "size": [250, 82]
+    }
+  ],
+  "connections": [
+    {"id": "sim-to-state", "from": "simulator", "to": "joint_state", "label": "현재 q", "variant": "emphasis"},
+    {"id": "sim-to-target", "from": "simulator", "to": "cartesian_target", "label": "목표 x_dot", "variant": "emphasis"},
+    {"id": "state-to-control", "from": "joint_state", "to": "controller", "label": "name/stamp/position", "labelAt": [565, 198]},
+    {"id": "target-to-control", "from": "cartesian_target", "to": "controller", "label": "frame/stamp/twist", "labelAt": [565, 466]},
+    {"id": "control-to-command", "from": "controller", "to": "safe_command", "label": "q_dot 제한 적용", "variant": "emphasis", "labelAt": [910, 206]},
+    {"id": "control-to-status", "from": "controller", "to": "sns_status", "label": "진단 스냅샷", "labelAt": [910, 396]},
+    {"id": "command-to-sim", "from": "safe_command", "to": "simulator", "label": "관절 적분 피드백", "variant": "dashed", "fromSide": "top", "toSide": "top", "via": [[1053, 60], [157, 60]], "labelAt": [605, 48]},
+    {"id": "command-to-audit", "from": "safe_command", "to": "auditor", "label": "한계 검사", "fromSide": "right", "toSide": "right", "via": [[1200, 156], [1200, 601]], "labelAt": [1182, 330]},
+    {"id": "status-to-audit", "from": "sns_status", "to": "auditor", "label": "동일 seq 교차검증", "fromSide": "bottom", "toSide": "top", "labelAt": [1120, 506]}
+  ],
+  "boundaries": [
+    {"kind": "region", "label": "ROS 2 / DDS 메시지 경계", "wraps": ["joint_state", "cartesian_target", "safe_command", "sns_status"], "pad": 18}
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "수치 커널 계약",
+      "items": ["3×3 고정 배열", "최대 3회 관절 포화", "동적 메모리 할당 없음"]
+    },
+    {
+      "dot": "amber",
+      "title": "안전 경계",
+      "items": ["task scale 0..1", "조건수 임계값 감시", "감사 실패 시 0 속도 명령"]
+    }
+  ]
+}

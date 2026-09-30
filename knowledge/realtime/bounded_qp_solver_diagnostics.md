@@ -54,5 +54,12 @@ ROS callback --fixed queue--> numerical kernel --fixed queue--> ROS publisher
 ## 관련 실습
 
 - `daily_robotics/2026-09-26`: 64회 projected-gradient, SPSC 경계, 독립 감사
+- `daily_robotics/2026-10-01`: 관절 수로 반복이 제한된 SNS active set, task scale/condition/residual 독립 감사
 - `knowledge/realtime/callback_budget_measurement.md`: callback 지연과 실행시간 계측
 - `knowledge/realtime/ros2_tracing_lttng.md`: end-to-end tracing
+
+## Active-set/SNS 커널을 bounded하게 만드는 법
+
+작은 고정 자유도에서는 projected-gradient의 고정 `K`뿐 아니라 active-set 반복도 구조적으로 제한할 수 있다. 관절 하나를 반복마다 자유 집합에서 제거하면 최대 반복은 관절 수 `n`이다.
+
+다만 “반복이 `n`회 이하”만으로 deadline이 보장되지는 않는다. 각 반복의 factorization/pseudoinverse 차원, rank 실패 경로, condition-dependent damping, ROS serialization을 모두 포함해 상한을 분석해야 한다. 진단에는 적어도 active/saturated mask, task scale, rank/condition, primal bound violation, scaled-task residual을 넣는다.
