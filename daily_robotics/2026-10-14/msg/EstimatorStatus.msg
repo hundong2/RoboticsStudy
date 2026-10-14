@@ -1,0 +1,11 @@
+std_msgs/Header header
+float64 replay_position
+float64 naive_position
+float64 replay_velocity
+float64 naive_velocity
+uint32 buffered_states
+uint32 last_replay_steps
+uint64 accepted_delayed_measurements
+uint64 dropped_too_old_measurements
+float64 last_measurement_age_ms
+float64 max_replay_time_us

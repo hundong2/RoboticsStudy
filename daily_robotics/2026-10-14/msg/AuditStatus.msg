@@ -1,0 +1,10 @@
+std_msgs/Header header
+uint64 matched_samples
+float64 replay_rmse
+float64 naive_rmse
+float64 improvement_percent
+uint64 accepted_delayed_measurements
+uint64 dropped_too_old_measurements
+uint32 max_replay_steps
+float64 max_replay_time_us
+bool passed
