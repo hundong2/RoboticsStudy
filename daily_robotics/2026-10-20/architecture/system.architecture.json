@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Bounded 지연 Factor 자세 융합",
+    "quality_profile": "showcase",
+    "viewBox": [1320, 860],
+    "views": [
+      {
+        "id": "measurement_path",
+        "label": "측정과 추정",
+        "focus": ["simulator", "relative_topic", "absolute_topic", "smoother", "fused_topic"],
+        "note": "원래 측정시각을 보존한 relative/absolute factor가 8-pose smoother로 들어가는 경로"
+      },
+      {
+        "id": "independent_audit",
+        "label": "독립 검증",
+        "focus": ["truth_topic", "fused_topic", "stats_topic", "auditor", "pass_topic"],
+        "note": "정답 pose와 추정 결과를 exact timestamp로 맞추고 계산 상한까지 함께 판정"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "simulator",
+      "type": "external",
+      "label": "Pose factor simulator",
+      "sublabel": "10 Hz · 3-tick delayed absolute",
+      "pos": [40, 330],
+      "size": [190, 82]
+    },
+    {
+      "id": "truth_topic",
+      "type": "messagebus",
+      "label": "/sim/truth_pose",
+      "sublabel": "PoseStamped · map",
+      "pos": [40, 90],
+      "size": [190, 76]
+    },
+    {
+      "id": "relative_topic",
+      "type": "messagebus",
+      "label": "/sim/relative_pose",
+      "sublabel": "base_previous · original stamp",
+      "pos": [270, 285],
+      "size": [190, 76]
+    },
+    {
+      "id": "absolute_topic",
+      "type": "messagebus",
+      "label": "/sim/absolute_pose",
+      "sublabel": "map · arrives 3 ticks late",
+      "pos": [270, 515],
+      "size": [190, 76]
+    },
+    {
+      "id": "smoother",
+      "type": "backend",
+      "label": "Bounded pose smoother",
+      "sublabel": "8 poses · 48D · 3 iterations",
+      "tag": "single-threaded",
+      "pos": [540, 355],
+      "size": [220, 88]
+    },
+    {
+      "id": "fused_topic",
+      "type": "messagebus",
+      "label": "/fusion/pose",
+      "sublabel": "corrected latest pose",
+      "pos": [820, 250],
+      "size": [190, 76]
+    },
+    {
+      "id": "stats_topic",
+      "type": "messagebus",
+      "label": "/fusion/stats",
+      "sublabel": "budget · drop · failure · latency",
+      "pos": [820, 485],
+      "size": [190, 76]
+    },
+    {
+      "id": "auditor",
+      "type": "security",
+      "label": "Independent auditor",
+      "sublabel": "96-slot truth ring · exact stamp",
+      "pos": [1080, 355],
+      "size": [205, 88]
+    },
+    {
+      "id": "pass_topic",
+      "type": "external",
+      "label": "/study/pass",
+      "sublabel": "transient-local verdict",
+      "pos": [1088, 620],
+      "size": [190, 76]
+    }
+  ],
+  "connections": [
+    {
+      "id": "sim_truth",
+      "from": "simulator",
+      "to": "truth_topic",
+      "label": "truth · measurement stamp"
+    },
+    {
+      "id": "sim_relative",
+      "from": "simulator",
+      "to": "relative_topic",
+      "label": "relative T + covariance",
+      "labelAt": [400, 450],
+      "variant": "emphasis"
+    },
+    {
+      "id": "sim_absolute",
+      "from": "simulator",
+      "to": "absolute_topic",
+      "label": "3-tick delay · stamp unchanged"
+    },
+    {
+      "id": "relative_smoother",
+      "from": "relative_topic",
+      "to": "smoother",
+      "label": "append between factor",
+      "labelAt": [500, 270],
+      "variant": "emphasis"
+    },
+    {
+      "id": "absolute_smoother",
+      "from": "absolute_topic",
+      "to": "smoother",
+      "label": "insert by original stamp"
+    },
+    {
+      "id": "smoother_fused",
+      "from": "smoother",
+      "to": "fused_topic",
+      "label": "optimized map pose",
+      "labelAt": [790, 246],
+      "variant": "emphasis"
+    },
+    {
+      "id": "smoother_stats",
+      "from": "smoother",
+      "to": "stats_topic",
+      "label": "48D budget · solve time"
+    },
+    {
+      "id": "truth_auditor",
+      "from": "truth_topic",
+      "to": "auditor",
+      "label": "exact-stamp truth"
+    },
+    {
+      "id": "fused_auditor",
+      "from": "fused_topic",
+      "to": "auditor",
+      "label": "pose error",
+      "labelAt": [1020, 340]
+    },
+    {
+      "id": "stats_auditor",
+      "from": "stats_topic",
+      "to": "auditor",
+      "label": "budget and failure checks"
+    },
+    {
+      "id": "auditor_pass",
+      "from": "auditor",
+      "to": "pass_topic",
+      "label": "80 samples → verdict",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "측정 계약",
+      "items": [
+        "absolute factor는 늦게 와도 원래 header.stamp를 유지",
+        "map과 base_previous frame 의미를 명시"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Bounded 경계",
+      "items": [
+        "최대 8 poses와 48차원 dense 선형계",
+        "3회 고정 반복; hard-RT 또는 WCET 주장은 아님"
+      ]
+    }
+  ]
+}

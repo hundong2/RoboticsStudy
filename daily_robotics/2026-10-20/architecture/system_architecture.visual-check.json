@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "visual-check",
+  "evidenceKind": "automated-browser",
+  "status": "fail",
+  "visualReview": "pending",
+  "artifact": {
+    "path": "D:\\workspace\\RoboticsStudy\\daily_robotics\\2026-10-20\\architecture\\system_architecture.html",
+    "sha256": "ae87e29c7460ab55e9779655c1b6e36733358a4105b9d08bfacb85a83b255683",
+    "bytes": 717030
+  },
+  "state": {
+    "detail": "read",
+    "motion": "still"
+  },
+  "chrome": {
+    "status": "available",
+    "executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+  },
+  "diagnostics": [
+    {
+      "code": "viewer/visual-check-runtime",
+      "severity": "error",
+      "message": "visual-check could not complete its Chrome inspection.",
+      "subject": {
+        "artifact": "D:\\workspace\\RoboticsStudy\\daily_robotics\\2026-10-20\\architecture\\system_architecture.html"
+      },
+      "evidence": {
+        "reason": "Page.loadEventFired: event timed out after 15000ms"
+      },
+      "supportedFixes": [
+        "resolve the reported Chrome inspection error, then rerun visual-check"
+      ]
+    }
+  ],
+  "containment": {
+    "status": "fail",
+    "viewports": []
+  },
+  "readability": {
+    "status": "fail",
+    "minimumProjectedNodeTextPx": 6,
+    "viewports": []
+  },
+  "viewerChrome": {
+    "status": "fail",
+    "viewports": []
+  },
+  "captures": {
+    "status": "fail",
+    "screenshots": [],
+    "contactSheet": null
+  },
+  "sidecars": {
+    "receipt": "system_architecture.visual-check.json",
+    "contactSheet": "system_architecture.visual-check.html"
+  },
+  "error": "Page.loadEventFired: event timed out after 15000ms"
+}
