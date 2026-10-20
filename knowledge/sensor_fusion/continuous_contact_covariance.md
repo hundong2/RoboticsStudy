@@ -20,3 +20,17 @@ covariance는 대칭 positive-semidefinite여야 한다. 학습 모델이 lower-
 2026-09-30 실습은 이 원리의 scalar 축약판을 `daily_robotics/2026-09-30`에 구현한다.
 
 참고: [CoCo-InEKF (RSS 2026)](https://arxiv.org/abs/2605.15122)
+
+## 이진 접촉 front-end와 EKF gate (2026-10-21)
+
+연속 covariance가 이상적이어도 force sensor에서 estimator로 들어가는 첫 방어선은 흔히 이진 contact state다. 이때 단일 threshold 대신 다음을 함께 쓴다.
+
+- ON/OFF threshold를 다르게 둔 hysteresis
+- 여러 표본이 연속돼야 mode를 확정하는 dwell
+- contact loss 징후가 시작되면 mode 확정 전에도 kinematic constraint를 즉시 비활성화
+- innovation covariance로 정규화한 NIS gate
+- reject가 지속되면 단순 outlier가 아니라 sensor/contact health fault로 승격
+
+이진 state는 계산과 안전 정책을 단순하게 하지만 부분 접촉, 방향성 slip, compliance를 숨긴다. 그러므로 binary FSM은 continuous contact covariance의 대체물이 아니라, bounded front-end 또는 fallback으로 보는 편이 맞다.
+
+2026-10-21 실습은 1D `x=[z,v_z,b_a]` EKF에서 force hysteresis와 2D NIS gate를 구현한다. 원 논문의 3D foothold state나 observability-constrained linearization은 포함하지 않는다.
