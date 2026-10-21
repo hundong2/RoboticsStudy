@@ -29,3 +29,21 @@ Back-end가 아무리 좋아도 잘못된 loop closure edge를 자동으로 진�
 ## 참고
 
 - [Grisetti et al., “A Tutorial on Graph-Based SLAM,” 2010](https://doi.org/10.1109/MITS.2010.939925)
+
+## Switchable constraint로 false loop 격리
+
+일반 pose graph는 edge topology를 정답으로 가정한다. 하지만 place recognition이 만든 false positive loop 하나가 모든 pose를 잘못된 절충점으로 끌 수 있다. 의심 가능한 loop마다 `s_ij`를 추가하면 topology 자체를 연속 최적화할 수 있다.
+
+\[
+\min_{X,S}\sum\|r^{odom}\|^2_{\Omega_o}
++\sum\|s_{ij}r^{loop}_{ij}\|^2_{\Omega_l}
++\sum\|1-s_{ij}\|^2_{\Xi},\quad 0\le s_{ij}\le1
+\]
+
+- 정상 loop: pose와 잘 맞으므로 prior가 `s≈1`을 유지한다.
+- false loop: residual 비용이 prior보다 커져 `s≈0`으로 내려간다.
+- `s`를 끄는 것은 그 edge의 information을 0에 가깝게 낮추는 해석과 같다.
+
+실무에서는 switch만 믿지 말고 front-end geometric verification, switch/residual diagnostics, graph rollback, 독립 안전 계층을 함께 둔다. prior information이 지나치게 강하면 false loop를 끄지 못하고, 약하면 정상 loop도 제거한다. 대규모 graph에는 dense solver 대신 sparse incremental solver와 graph-size/latency budget이 필요하다.
+
+- [Sünderhauf and Protzel, “Switchable Constraints for Robust Pose Graph SLAM,” IROS 2012](https://doi.org/10.1109/IROS.2012.6385590)
