@@ -1,0 +1,12 @@
+std_msgs/Header header
+uint32 sequence
+float64 raw_effort
+float64 position
+float64 velocity
+float64 position_variance
+float64 calibration_scale
+float64 learned_nis
+bool learned_measurement_accepted
+uint32 ood_reject_count
+uint32 nis_reject_count
+float64 cycle_time_us

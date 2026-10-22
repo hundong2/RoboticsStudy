@@ -1,0 +1,9 @@
+std_msgs/Header header
+uint32 sequence
+float64 truth_position
+float64 truth_velocity
+float64 encoder_position
+float64 learned_position
+float64 learned_variance
+float64 ood_score
+float64 raw_effort

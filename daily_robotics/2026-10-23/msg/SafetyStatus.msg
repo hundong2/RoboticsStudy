@@ -1,0 +1,14 @@
+std_msgs/Header header
+uint32 sequence
+float64 raw_effort
+float64 safe_effort
+float64 estimated_velocity
+float64 positive_power
+float64 energy_bucket
+bool rate_limited
+bool power_limited
+bool energy_limited
+uint32 rate_limit_count
+uint32 power_limit_count
+uint32 energy_limit_count
+float64 cycle_time_us
