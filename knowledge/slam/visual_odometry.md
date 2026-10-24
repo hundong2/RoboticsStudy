@@ -49,6 +49,19 @@ Visual Odometry(VO)는 연속 camera 관측으로 국소 motion을 누적한다.
 - Dataset 평균 FPS가 아니라 target workload의 latency tail과 failure recovery를 검증한다.
 - Pose frame, timestamp, covariance, scale observability를 interface contract에 넣는다.
 
+## 2026-10-25 — Feature frontend와 metric scale 경계
+
+Shi–Tomasi selector는 local structure tensor의 작은 고윳값으로 tracker의 최악 방향 conditioning을 본다. 평탄 영역은 두 고윳값이 모두 작고, edge는 하나가 작으며, corner/texture는 둘 다 크다. 다만 detector score가 높다는 사실은 정적 3D 배경, 충분한 parallax, 올바른 correspondence를 보장하지 않는다.
+
+Frontend에서 최소한 다음을 분리 계측한다.
+
+- detector: candidate/selected 수, minimum score, spatial distribution
+- tracker: photometric residual, forward-backward error, track age
+- geometry: inlier ratio, parallax, reprojection error, conditioning
+- runtime: queue drop, processing age, feature/iteration/hypothesis cap, latency tail
+
+Known-depth 평면에서는 `Δx=-ZΔu/fx`로 pixel flow를 metric translation으로 바꿀 수 있다. 일반 monocular 2D–2D geometry에서는 absolute scale이 관찰되지 않으므로 이 식의 `Z`를 몰래 상수로 두고 metric VO라고 주장하면 안 된다. Stereo/RGB-D, IMU, wheel odometry, known landmarks 등 scale source를 interface에 명시한다.
+
 ## 참고
 
 - [ORB-SLAM — IEEE TRO 2015](https://doi.org/10.1109/TRO.2015.2463671)

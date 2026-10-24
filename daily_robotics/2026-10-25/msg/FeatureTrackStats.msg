@@ -1,0 +1,17 @@
+std_msgs/Header header
+uint32 sequence
+uint32 candidate_count
+uint32 selected_count
+uint32 tracked_count
+uint32 forward_backward_rejections
+uint32 residual_rejections
+uint32 frame_queue_drops
+float64 median_flow_x
+float64 estimated_delta_x
+float64 accumulated_x
+float64 minimum_selected_eigenvalue
+float64 median_residual
+float64 latest_kernel_us
+float64 max_kernel_us
+bool camera_model_valid
+bool bounds_respected
