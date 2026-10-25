@@ -62,6 +62,14 @@ Frontend에서 최소한 다음을 분리 계측한다.
 
 Known-depth 평면에서는 `Δx=-ZΔu/fx`로 pixel flow를 metric translation으로 바꿀 수 있다. 일반 monocular 2D–2D geometry에서는 absolute scale이 관찰되지 않으므로 이 식의 `Z`를 몰래 상수로 두고 metric VO라고 주장하면 안 된다. Stereo/RGB-D, IMU, wheel odometry, known landmarks 등 scale source를 interface에 명시한다.
 
+## Stereo metric front-end와 bounded RANSAC
+
+Rectified stereo는 `Z=f_xB/d`로 feature별 metric depth를 제공하지만, `sigma_Z≈f_xB sigma_d/d^2`이므로 먼 점의 불확실성이 급격히 커진다. frame-to-frame 강체변환의 inlier gate는 이 depth uncertainty를 반영하되, 큰 sigma 하나가 gate를 무한히 느슨하게 만들지 않도록 max range/threshold cap을 둔다.
+
+RANSAC을 RT 경로에 넣을 때는 correspondence 수 `M`, hypothesis 수 `H`, local refinement 횟수를 모두 제한한다. 기본 score 상한은 `H*M` residual이다. inlier 수만 높아도 feature가 한 줄이나 작은 image 영역에 몰리면 일부 motion이 약하게 관찰되므로 image covariance eigen ratio, Hessian singular value, parallax 같은 spatial-degeneracy 지표를 함께 내보낸다.
+
+대표 구현은 `daily_robotics/2026-10-26`의 48-match, 24-hypothesis planar stereo odometry다. 이는 full 6-DoF PnP/BA가 아니라 계산 경계와 실패 telemetry를 학습하기 위한 축약형이다.
+
 ## 참고
 
 - [ORB-SLAM — IEEE TRO 2015](https://doi.org/10.1109/TRO.2015.2463671)
