@@ -1,0 +1,16 @@
+std_msgs/Header header
+uint32 sequence
+uint32 input_events
+uint32 valid_events
+uint32 hypotheses_evaluated
+uint32 queue_drops
+float64 estimated_vx_px_s
+float64 estimated_vy_px_s
+float64 best_contrast
+float64 second_contrast
+float64 peak_ratio
+float64 latest_kernel_us
+float64 max_kernel_us
+bool packet_contract_valid
+bool peak_is_observable
+bool bounds_respected

@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ROS 2 Bounded Event-Flow 아키텍처",
+    "quality_profile": "showcase",
+    "viewBox": [1200, 720],
+    "views": [
+      {
+        "id": "data-path",
+        "label": "Event data path",
+        "focus": ["simulator", "input", "ring", "worker", "contrast", "stats"],
+        "note": "128-event packet이 fixed-capacity RT 경계를 통과하는 주 경로"
+      },
+      {
+        "id": "audit-path",
+        "label": "Independent audit",
+        "focus": ["truth", "stats", "auditor", "pass"],
+        "note": "같은 acquisition stamp의 truth와 결과를 독립적으로 검증"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "simulator",
+      "type": "external",
+      "label": "Event driver",
+      "sublabel": "100 Hz · 128 events",
+      "pos": [30, 170],
+      "size": [140, 76]
+    },
+    {
+      "id": "input",
+      "type": "frontend",
+      "label": "Input callback",
+      "sublabel": "SensorDataQoS",
+      "pos": [220, 170],
+      "size": [140, 76]
+    },
+    {
+      "id": "ring",
+      "type": "messagebus",
+      "label": "SPSC ring",
+      "sublabel": "4 fixed slots",
+      "pos": [410, 170],
+      "size": [140, 76]
+    },
+    {
+      "id": "worker",
+      "type": "backend",
+      "label": "Bounded worker",
+      "sublabel": "200 Hz · max 1 packet",
+      "pos": [600, 170],
+      "size": [150, 76]
+    },
+    {
+      "id": "contrast",
+      "type": "backend",
+      "label": "Contrast kernel",
+      "sublabel": "49 hypotheses",
+      "pos": [800, 170],
+      "size": [150, 76]
+    },
+    {
+      "id": "stats",
+      "type": "messagebus",
+      "label": "Motion stats",
+      "sublabel": "Reliable telemetry",
+      "pos": [1000, 170],
+      "size": [150, 76]
+    },
+    {
+      "id": "truth",
+      "type": "external",
+      "label": "Simulation truth",
+      "sublabel": "Test-only reference",
+      "pos": [30, 380],
+      "size": [140, 76]
+    },
+    {
+      "id": "auditor",
+      "type": "security",
+      "label": "Exact-stamp auditor",
+      "sublabel": "80-sample acceptance",
+      "pos": [1000, 380],
+      "size": [150, 76]
+    },
+    {
+      "id": "pass",
+      "type": "external",
+      "label": "Study result",
+      "sublabel": "/study/pass",
+      "pos": [1000, 550],
+      "size": [150, 76]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "MultiThreadedExecutor(2) · separated callback groups",
+      "wraps": ["input", "ring", "worker", "contrast"],
+      "pad": 26
+    }
+  ],
+  "connections": [
+    {
+      "id": "events",
+      "from": "simulator",
+      "to": "input",
+      "label": "EventPacket · Best Effort",
+      "variant": "emphasis",
+      "labelAt": [195, 260]
+    },
+    {
+      "id": "handoff",
+      "from": "input",
+      "to": "ring",
+      "label": "shared_ptr handoff",
+      "labelAt": [385, 260]
+    },
+    {
+      "id": "dequeue",
+      "from": "ring",
+      "to": "worker",
+      "label": "max 1 / wake-up",
+      "labelAt": [575, 150]
+    },
+    {
+      "id": "evaluate",
+      "from": "worker",
+      "to": "contrast",
+      "label": "fixed work",
+      "labelAt": [775, 150]
+    },
+    {
+      "id": "publish-stats",
+      "from": "contrast",
+      "to": "stats",
+      "label": "flow + peak + budget",
+      "variant": "emphasis",
+      "labelAt": [975, 150]
+    },
+    {
+      "id": "truth-source",
+      "from": "simulator",
+      "to": "truth",
+      "label": "same acquisition stamp",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [100, 270]
+    },
+    {
+      "id": "truth-audit",
+      "from": "truth",
+      "to": "auditor",
+      "label": "truth by stamp",
+      "variant": "dashed"
+    },
+    {
+      "id": "stats-audit",
+      "from": "stats",
+      "to": "auditor",
+      "label": "stats by stamp",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [1075, 270]
+    },
+    {
+      "id": "audit-result",
+      "from": "auditor",
+      "to": "pass",
+      "label": "Transient Local",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [1075, 480]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Bounded hot path",
+      "items": ["128 events · 49 hypotheses", "4-slot SPSC · one packet per wake-up"]
+    },
+    {
+      "dot": "amber",
+      "title": "검증 경계",
+      "items": ["Truth는 estimator 입력이 아님", "관측 시간은 WCET가 아님"]
+    }
+  ]
+}
